@@ -1,0 +1,1177 @@
+/* ========================================
+   QUIZMASTER - KAHOOT! INSPIRED COLORS
+   Vibrant, colorful design with no black colors
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #46178f 0%, #9c4dff 50%, #ff6900 100%);
+    min-height: 100vh;
+    color: white;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+/* ========================================
+   HEADER STYLES - KAHOOT! COLORS
+   ======================================== */
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+    position: relative;
+    z-index: 1;
+}
+
+header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 10px;
+    text-shadow: 3px 3px 6px rgba(70, 23, 143, 0.5);
+    color: #ffffff;
+    font-weight: 900;
+}
+
+header p {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    opacity: 0.95;
+    color: #f0f0f0;
+}
+
+/* ========================================
+   USER HEADER - KAHOOT! STYLE
+   ======================================== */
+
+.user-header {
+    position: fixed !important;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #ff6900 0%, #ffb800 100%);
+    backdrop-filter: blur(15px);
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    z-index: 1000;
+    max-width: calc(100vw - 30px);
+    box-shadow: 0 8px 32px rgba(255, 105, 0, 0.3);
+}
+
+.user-info {
+    color: white;
+    font-size: 14px;
+    text-align: right;
+    font-weight: 600;
+}
+
+.user-name {
+    font-weight: 800;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    color: #ffffff;
+}
+
+.user-email {
+    opacity: 0.9;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    color: #ffe6d1;
+}
+
+.user-header button {
+    background: linear-gradient(135deg, #46178f 0%, #7b2cbf 100%);
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(70, 23, 143, 0.3);
+}
+
+.user-header button:hover {
+    background: linear-gradient(135deg, #5a1a9e 0%, #8f35d1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(70, 23, 143, 0.4);
+}
+
+/* ========================================
+   MAIN MENU - KAHOOT! CARDS
+   ======================================== */
+
+.main-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+    margin-top: 60px;
+}
+
+.menu-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 30px;
+    text-align: center;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(70, 23, 143, 0.2);
+}
+
+.menu-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+    pointer-events: none; /* FIX: Prevents the shimmer from blocking clicks */
+    z-index: 0;
+}
+
+.menu-card:hover::before {
+    animation: shimmer 1.5s ease-in-out;
+}
+
+.menu-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(70, 23, 143, 0.3);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Ensure card contents stay above the shimmer */
+.menu-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.menu-card h2 {
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    margin-bottom: 15px;
+    color: #ffffff;
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(70, 23, 143, 0.3);
+}
+
+.menu-card p {
+    margin-bottom: 25px;
+    opacity: 0.95;
+    line-height: 1.6;
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    color: #f5f5f5;
+    font-weight: 500;
+}
+
+/* ========================================
+   INPUT GROUPS - KAHOOT! STYLE
+   ======================================== */
+
+.input-group {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 10; /* FIX: Ensure inputs are brought to the front */
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border: 3px solid #ff6900;
+    border-radius: 15px;
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+    color: #46178f;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(255, 105, 0, 0.2);
+    position: relative;
+    z-index: 10;
+    pointer-events: auto; /* FIX: Guarantee clickability */
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #9c4dff;
+    box-shadow: 0 0 0 4px rgba(156, 77, 255, 0.3);
+    transform: translateY(-2px);
+    background: #ffffff;
+}
+
+.input-group input::placeholder {
+    color: #7b2cbf;
+    opacity: 0.7;
+}
+
+/* ========================================
+   BUTTONS - KAHOOT! SIGNATURE COLORS
+   ======================================== */
+
+.btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 50px;
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    min-width: 180px;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #e21b3c 0%, #ff6900 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #ff6900 0%, #e21b3c 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(226, 27, 60, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #1368ce 0%, #46178f 100%);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #46178f 0%, #1368ce 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(19, 104, 206, 0.4);
+}
+
+.btn-tertiary {
+    background: linear-gradient(135deg, #9c4dff 0%, #7b2cbf 100%);
+    color: white;
+}
+
+.btn-tertiary:hover {
+    background: linear-gradient(135deg, #7b2cbf 0%, #9c4dff 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(156, 77, 255, 0.4);
+}
+
+/* ========================================
+   QUIZ GAME STYLES - KAHOOT! BRIGHT COLORS
+   ======================================== */
+
+.quiz-container {
+    text-align: center;
+    padding: 15px;
+    margin-top: 60px;
+}
+
+.question-card {
+    background: linear-gradient(135deg, #46178f 0%, #7b2cbf 50%, #9c4dff 100%);
+    color: #ffffff;
+    padding: clamp(25px, 5vw, 50px);
+    border-radius: 30px;
+    margin: 20px auto;
+    max-width: 1000px;
+    box-shadow: 0 20px 60px rgba(70, 23, 143, 0.4);
+    position: relative;
+    overflow: hidden;
+    border: 5px solid #ffffff;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 25px;
+    border-bottom: 4px solid rgba(255, 255, 255, 0.3);
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.question-number {
+    background: linear-gradient(135deg, #1368ce 0%, #3742fa 100%);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 30px;
+    font-weight: 900;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    white-space: nowrap;
+    box-shadow: 0 8px 25px rgba(19, 104, 206, 0.4);
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.timer {
+    background: linear-gradient(135deg, #26d0ce 0%, #1dd1a1 100%);
+    color: white;
+    padding: 18px 30px;
+    border-radius: 35px;
+    font-weight: 900;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    box-shadow: 0 10px 30px rgba(38, 208, 206, 0.5);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    border: 4px solid rgba(255, 255, 255, 0.4);
+    min-width: 120px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+.timer.urgent {
+    background: linear-gradient(135deg, #e21b3c 0%, #ff4757 100%) !important;
+    animation: urgentPulse 0.5s infinite;
+    transform: scale(1.1);
+    box-shadow: 0 15px 40px rgba(226, 27, 60, 0.6) !important;
+}
+
+.timer.warning {
+    background: linear-gradient(135deg, #ff6900 0%, #ff8c00 100%) !important;
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(255, 105, 0, 0.5) !important;
+}
+
+@keyframes urgentPulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1.1); 
+        box-shadow: 0 15px 40px rgba(226, 27, 60, 0.6);
+    }
+    50% { 
+        opacity: 0.8; 
+        transform: scale(1.15); 
+        box-shadow: 0 20px 50px rgba(226, 27, 60, 0.8);
+    }
+}
+
+.question-text {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    margin-bottom: 40px;
+    line-height: 1.3;
+    color: #ffffff;
+    word-wrap: break-word;
+    hyphens: auto;
+    font-weight: 800;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 20px;
+}
+
+/* ========================================
+   ANSWERS GRID - ENHANCED FOR HOST AND PLAYER VIEWS
+   ======================================== */
+
+.answers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin: 40px auto;
+    max-width: 800px;
+    padding: 0 20px;
+}
+
+.answer-btn {
+    padding: 25px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    word-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.4;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+    border: 4px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.answer-btn:nth-child(1) { 
+    background: linear-gradient(135deg, #e21b3c 0%, #ff3838 100%);
+}
+.answer-btn:nth-child(2) { 
+    background: linear-gradient(135deg, #1368ce 0%, #2980ff 100%);
+}
+.answer-btn:nth-child(3) { 
+    background: linear-gradient(135deg, #ffc048 0%, #ffb400 100%);
+    color: #333;
+    text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8);
+}
+.answer-btn:nth-child(4) { 
+    background: linear-gradient(135deg, #26d0ce 0%, #00a8a6 100%);
+}
+
+.answer-btn:hover {
+    transform: scale(1.08) translateY(-8px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+.answer-btn:active {
+    transform: scale(1.05) translateY(-4px);
+}
+
+.answer-btn:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.host-answer-option {
+    padding: 20px 25px;
+    margin: 15px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 20px;
+    border: 3px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.5s ease;
+    color: #333;
+    position: relative;
+    overflow: hidden;
+    min-height: 70px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.host-answer-option .correct-indicator {
+    display: none !important;
+}
+
+.host-answer-option.time-ended.is-correct {
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%) !important;
+    color: white !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4) !important;
+    transform: scale(1.05) !important;
+    animation: correctReveal 1s ease-out !important;
+}
+
+.host-answer-option.time-ended.is-correct .correct-indicator {
+    display: inline-block !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    color: #4caf50;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 900;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.6);
+    animation: bounceIn 0.8s ease-out;
+    flex-shrink: 0;
+    border: 3px solid rgba(76, 175, 80, 0.8);
+}
+
+.host-answer-option.time-ended.is-incorrect {
+    background: linear-gradient(135deg, #f44336 0%, #ef5350 100%) !important;
+    color: white !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3) !important;
+    opacity: 0.8 !important;
+}
+
+@keyframes correctReveal {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 15px 35px rgba(76, 175, 80, 0.5);
+    }
+    100% { 
+        transform: scale(1.05);
+        box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
+    }
+}
+
+@keyframes incorrectFade {
+    0% { opacity: 1; }
+    100% { opacity: 0.8; }
+}
+
+.answer-letter {
+    background: #46178f;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.4rem;
+    transition: all 0.5s ease;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(70, 23, 143, 0.3);
+}
+
+.host-answer-option.time-ended.is-correct .answer-letter {
+    background: #ffffff !important;
+    color: #4caf50 !important;
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.5) !important;
+    transform: rotate(360deg) !important;
+}
+
+.host-answer-option.time-ended.is-incorrect .answer-letter {
+    background: #ffffff !important;
+    color: #f44336 !important;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3) !important;
+}
+
+.answer-text {
+    flex: 1;
+    font-weight: 700;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.correct-indicator {
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 900;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    animation: bounceIn 0.8s ease-out;
+    flex-shrink: 0;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+}
+
+@keyframes bounceIn {
+    0% { 
+        transform: scale(0.3); 
+        opacity: 0; 
+    }
+    50% { 
+        transform: scale(1.1); 
+        opacity: 1; 
+    }
+    100% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+}
+
+/* ========================================
+   GAME CONTROLS - KAHOOT! STYLE
+   ======================================== */
+
+.game-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.game-controls .btn {
+    min-width: 140px;
+    flex: 0 1 auto;
+}
+
+/* ========================================
+   HOST DASHBOARD - BRIGHT KAHOOT! LAYOUT
+   ======================================== */
+
+.host-dashboard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.main-content {
+    order: 1;
+}
+
+.players-list {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+    color: #46178f;
+    padding: 25px;
+    border-radius: 25px;
+    max-height: 400px;
+    overflow-y: auto;
+    order: 2;
+    border: 4px solid #ff6900;
+    box-shadow: 0 15px 35px rgba(255, 105, 0, 0.3);
+}
+
+.players-list h3 {
+    color: #46178f;
+    font-weight: 900;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+.player-item {
+    padding: 15px 20px;
+    margin: 12px 0;
+    background: linear-gradient(135deg, #e21b3c 0%, #ff4757 100%);
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    flex-wrap: wrap;
+    gap: 10px;
+    color: white;
+    box-shadow: 0 8px 25px rgba(226, 27, 60, 0.4);
+}
+
+.player-item:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 35px rgba(226, 27, 60, 0.5);
+}
+
+.player-name {
+    font-weight: 800;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    color: white;
+    word-wrap: break-word;
+    flex: 1;
+    min-width: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.player-details {
+    text-align: right;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    flex-shrink: 0;
+    color: #ffe6e6;
+    font-weight: 700;
+}
+
+.player-status {
+    font-size: 0.9rem;
+    padding: 4px 12px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced Player Response Styles */
+.player-response {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 20px;
+    margin: 8px 0;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-radius: 15px;
+    border: 2px solid #2196f3;
+    transition: all 0.3s ease;
+}
+
+.player-response-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.player-total-score {
+    background: linear-gradient(135deg, #ff6900 0%, #ff8c00 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.response-status.answered {
+    background: linear-gradient(135deg, #26d0ce 0%, #1dd1a1 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    align-self: flex-start;
+}
+
+.response-status.answered.correct {
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    animation: correctAnswer 0.5s ease-out;
+}
+
+.response-status.answered.incorrect {
+    background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+    animation: incorrectAnswer 0.5s ease-out;
+}
+
+.response-status.waiting {
+    background: linear-gradient(135deg, #ffc048 0%, #ffb400 100%);
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    align-self: flex-start;
+}
+
+@keyframes correctAnswer {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes incorrectAnswer {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+.score-info {
+    margin-top: 5px;
+    font-weight: 800;
+    color: #4caf50;
+    font-size: 0.9rem;
+    text-align: center;
+    background: rgba(76, 175, 80, 0.1);
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+/* ========================================
+   LEADERBOARD - BRIGHT KAHOOT! PODIUM STYLE
+   ======================================== */
+
+.leaderboard {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+    color: #46178f;
+    padding: 30px;
+    border-radius: 25px;
+    margin: 20px auto;
+    max-width: 650px;
+    border: 4px solid #9c4dff;
+    box-shadow: 0 20px 50px rgba(156, 77, 255, 0.3);
+}
+
+.leaderboard h2, .leaderboard h3 {
+    margin-bottom: 25px;
+    color: #46178f;
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.player-score {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 25px;
+    margin: 15px 0;
+    background: linear-gradient(135deg, #26d0ce 0%, #00a8a6 100%);
+    border-radius: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: white;
+    box-shadow: 0 8px 25px rgba(38, 208, 206, 0.4);
+    min-height: 60px;
+}
+
+.player-score:hover {
+    transform: translateX(10px) scale(1.02);
+    box-shadow: 0 12px 35px rgba(38, 208, 206, 0.5);
+}
+
+.player-score.rank-1 {
+    background: linear-gradient(135deg, #ffc048 0%, #ffb400 100%);
+    border-color: #ffffff;
+    box-shadow: 0 12px 40px rgba(255, 192, 72, 0.5);
+    transform: scale(1.05);
+    color: #333;
+    text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8);
+}
+
+.player-score.rank-2 {
+    background: linear-gradient(135deg, #ddd6fe 0%, #9c4dff 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(156, 77, 255, 0.4);
+    transform: scale(1.02);
+}
+
+.player-score.rank-3 {
+    background: linear-gradient(135deg, #fed7aa 0%, #ff6900 100%);
+    color: white;
+    box-shadow: 0 8px 25px rgba(255, 105, 0, 0.4);
+}
+
+.player-score .player-name {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    word-wrap: break-word;
+    flex: 1;
+    min-width: 0;
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.player-points {
+    font-weight: 900;
+    color: inherit;
+    font-size: clamp(1.1rem, 2.5vw, 1.2rem);
+    flex-shrink: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ========================================
+   STATUS MESSAGES - KAHOOT! NOTIFICATIONS
+   ======================================== */
+
+.status-message {
+    text-align: center;
+    padding: 15px 25px;
+    border-radius: 15px;
+    margin: 20px auto;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    max-width: 90%;
+    word-wrap: break-word;
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.status-message.error {
+    background: linear-gradient(135deg, #e21b3c 0%, #ff4757 100%);
+    color: white;
+    border-color: #ffffff;
+}
+
+.status-message.success {
+    background: linear-gradient(135deg, #26d0ce 0%, #1dd1a1 100%);
+    color: white;
+    border-color: #ffffff;
+}
+
+.status-message.info {
+    background: linear-gradient(135deg, #1368ce 0%, #3742fa 100%);
+    color: white;
+    border-color: #ffffff;
+}
+
+/* ========================================
+   GAME PIN DISPLAY - KAHOOT! STYLE
+   ======================================== */
+
+.game-pin {
+    background: linear-gradient(135deg, #46178f 0%, #9c4dff 100%);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 20px;
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    border: 4px solid #ffffff;
+    box-shadow: 0 10px 30px rgba(70, 23, 143, 0.4);
+    display: inline-block;
+    margin: 10px 0;
+}
+
+/* ========================================
+   SHIMMER ANIMATION
+   ======================================== */
+
+@keyframes shimmer {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%) rotate(45deg);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(100%) rotate(45deg);
+    }
+}
+
+/* ========================================
+   PULSE ANIMATION FOR URGENT STATES
+   ======================================== */
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   MOBILE SPECIFIC STYLES (320px - 768px)
+   ======================================== */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px 10px;
+    }
+    
+    .main-menu {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-top: 80px;
+    }
+    
+    .menu-card {
+        padding: 25px;
+        margin: 0 5px;
+    }
+    
+    .question-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .answers-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 0 10px;
+    }
+    
+    .host-answer-option {
+        padding: 15px 20px;
+        margin: 10px 0;
+    }
+    
+    .answer-letter {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .answer-text {
+        font-size: 1rem;
+    }
+    
+    .timer {
+        padding: 12px 20px;
+        font-size: clamp(1.1rem, 4vw, 1.4rem);
+        min-width: 100px;
+    }
+    
+    .game-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .game-controls .btn {
+        min-width: 200px;
+        width: 100%;
+    }
+    
+    .player-response {
+        padding: 12px 15px;
+        margin: 6px 0;
+    }
+    
+    .player-response-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .user-header {
+        top: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        max-width: calc(100vw - 20px);
+    }
+    
+    .user-name, .user-email {
+        max-width: 100px;
+    }
+}
+
+/* ========================================
+   TABLET SPECIFIC STYLES (768px - 1024px)
+   ======================================== */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .answers-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        max-width: 700px;
+    }
+    
+    .host-answer-option {
+        padding: 18px 22px;
+    }
+    
+    .question-header {
+        gap: 15px;
+    }
+}
+
+/* ========================================
+   LARGE SCREEN OPTIMIZATIONS (1024px+)
+   ======================================== */
+
+@media (min-width: 1024px) {
+    .host-dashboard {
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+    
+    .main-content {
+        order: 1;
+    }
+    
+    .players-list {
+        order: 2;
+        position: sticky;
+        top: 30px;
+        max-height: calc(100vh - 60px);
+    }
+    
+    .answers-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        max-width: 900px;
+    }
+}
+
+/* ========================================
+   HIGH DPI DISPLAY OPTIMIZATIONS
+   ======================================== */
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .timer {
+        font-weight: 900;
+        text-rendering: optimizeLegibility;
+    }
+    
+    .answer-letter {
+        font-weight: 900;
+        text-rendering: optimizeLegibility;
+    }
+    
+    .question-text {
+        text-rendering: optimizeLegibility;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .timer.urgent {
+        animation: none !important;
+    }
+    
+    .host-answer-option.time-ended.is-correct {
+        animation: none !important;
+    }
+}
+
+/* Focus indicators for keyboard navigation */
+button:focus,
+input:focus {
+    outline: 3px solid #ff6900;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .timer {
+        border: 4px solid #000000;
+    }
+    
+    .host-answer-option {
+        border: 3px solid #000000;
+    }
+    
+    .btn {
+        border: 2px solid #000000;
+    }
+}

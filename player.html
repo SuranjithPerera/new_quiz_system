@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Quiz - QuizMaster</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div id="joining-game" class="quiz-container">
+            <div class="question-card">
+                <h2>🎮 Joining Game...</h2>
+                <div id="join-status">
+                    <p>Connecting to game...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="waiting-lobby" class="quiz-container" style="display: none;">
+            <div class="question-card">
+                <h2>🎯 Ready to Play!</h2>
+                <div class="game-info">
+                    <p>Game PIN: <span id="player-game-pin" class="game-pin"></span></p>
+                    <p>Player: <strong id="player-name-display"></strong></p>
+                    <div id="waiting-message">
+                        <p>⏳ Waiting for the host to start the quiz...</p>
+                        <div class="player-count-info">
+                            <p>Players in game: <span id="lobby-player-count">1</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="active-question" class="quiz-container" style="display: none;">
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-number">Question <span id="question-num">1</span></div>
+                    <div class="timer" id="question-timer">00:20</div>
+                </div>
+                <div class="question-text" id="question-text"></div>
+                <div class="answers-grid" id="answers-grid"></div>
+                <div id="answer-feedback" style="display: none;">
+                    <div id="feedback-message"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="waiting-next" class="quiz-container" style="display: none;">
+            <div class="question-card">
+                <div id="answer-result">
+                    <h2 id="result-message">Great job!</h2>
+                    <div id="score-info">
+                        <p>Your score: <span id="current-score">0</span> points</p>
+                    </div>
+                </div>
+                <div class="leaderboard" id="current-leaderboard"></div>
+                <div id="next-question-message">
+                    <div style="background: linear-gradient(135deg, #1368ce 0%, #3742fa 100%); color: white; padding: 20px; border-radius: 20px; margin: 20px 0; border: 3px solid #ffffff; box-shadow: 0 10px 30px rgba(19, 104, 206, 0.4);">
+                        <h3 style="margin: 0 0 10px 0; font-size: 1.5rem;">⏳ Waiting...</h3>
+                        <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">Waiting for next question...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="final-results" class="quiz-container" style="display: none;">
+            <div class="question-card">
+                <div style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white; padding: 25px; border-radius: 25px; margin: 0 0 30px 0; border: 4px solid #ffffff; box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4); animation: gameOverPulse 2s ease-in-out infinite alternate;">
+                    <h2 style="margin: 0 0 15px 0; font-size: 2.5rem; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);">🏆 Quiz Complete!</h2>
+                    <p style="margin: 0; font-size: 1.3rem; font-weight: 700; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);">🎉 All questions have been answered! 🎉</p>
+                </div>
+                
+                <div id="final-score-card" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%); backdrop-filter: blur(20px); border-radius: 20px; padding: 25px; margin: 20px 0; border: 3px solid rgba(255, 255, 255, 0.3);">
+                    <h3 style="color: #ffffff; margin-bottom: 15px; font-size: 1.5rem;">Your Final Score</h3>
+                    <div class="final-score" id="player-final-score" style="font-size: 2.5rem; font-weight: 900; color: #ffd700; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4); margin: 15px 0;">0 points</div>
+                    <div class="final-rank" id="player-final-rank" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);">#1</div>
+                </div>
+                
+                <div class="leaderboard" id="final-leaderboard-player"></div>
+                
+                <div class="game-controls" style="margin-top: 30px;">
+                    <button onclick="playAgain()" class="btn btn-primary" style="font-size: 1.2rem; padding: 18px 35px; min-width: 200px;">🔄 Play Again</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="status" class="status-message"></div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2sHk8KwuoJlIBK0ceZxS2IvKgquid04A",
+            authDomain: "quizsystem-fbdb9.firebaseapp.com",
+            databaseURL: "https://quizsystem-fbdb9-default-rtdb.firebaseio.com",
+            projectId: "quizsystem-fbdb9",
+            storageBucket: "quizsystem-fbdb9.firebasestorage.app",
+            messagingSenderId: "637015291465",
+            appId: "1:637015291465:web:893fea9aea38abda6df198",
+            measurementId: "G-QGJM9L11N9"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        function generatePlayerId() {
+            return Date.now().toString() + '_' + Math.floor(Math.random() * 1000).toString();
+        }
+
+        function getGameRef(pin) {
+            return database.ref(`games/${pin}`);
+        }
+
+        function getPlayersRef(pin) {
+            return database.ref(`games/${pin}/players`);
+        }
+
+        function getGameStateRef(pin) {
+            return database.ref(`games/${pin}/gameState`);
+        }
+
+        class QuizGame {
+            constructor(gamePin, isHost = false) {
+                this.gamePin = gamePin;
+                this.isHost = isHost;
+                this.players = {};
+            }
+
+            async joinGame(playerName) {
+                try {
+                    const playerId = generatePlayerId();
+                    const playerData = {
+                        id: playerId,
+                        name: playerName,
+                        score: 0,
+                        status: 'waiting',
+                        joinedAt: Date.now()
+                    };
+
+                    await getPlayersRef(this.gamePin).child(playerId).set(playerData);
+                    return playerId;
+                } catch (error) {
+                    return null;
+                }
+            }
+
+            async submitAnswer(playerId, answerIndex) {
+                try {
+                    const playerRef = getPlayersRef(this.gamePin).child(playerId);
+                    await playerRef.update({
+                        currentAnswer: answerIndex,
+                        status: 'answered',
+                        answerTime: Date.now()
+                    });
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+
+            listenToGameState(callback) {
+                getGameStateRef(this.gamePin).on('value', (snapshot) => {
+                    const gameState = snapshot.val();
+                    if (gameState) {
+                        callback(gameState);
+                    }
+                });
+            }
+
+            listenToPlayers(callback) {
+                getPlayersRef(this.gamePin).on('value', (snapshot) => {
+                    const players = snapshot.val() || {};
+                    callback(players);
+                });
+            }
+
+            cleanup() {
+                if (this.gamePin) {
+                    getGameRef(this.gamePin).off();
+                    getPlayersRef(this.gamePin).off();
+                    getGameStateRef(this.gamePin).off();
+                }
+            }
+        }
+
+        const gameOverCSS = `
+        <style>
+        @keyframes gameOverPulse {
+            0% {
+                box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4);
+                transform: scale(1);
+            }
+            100% {
+                box-shadow: 0 20px 50px rgba(76, 175, 80, 0.6);
+                transform: scale(1.02);
+            }
+        }
+        
+        .game-over-celebration {
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+            border: 4px solid #ffffff;
+            animation: gameOverPulse 2s ease-in-out infinite alternate;
+        }
+        </style>
+        `;
+        
+        const styleElement = document.createElement('div');
+        styleElement.innerHTML = gameOverCSS;
+        document.head.appendChild(styleElement.firstElementChild);
+    </script>
+    
+    <script src="player.js"></script>
+</body>
+</html>

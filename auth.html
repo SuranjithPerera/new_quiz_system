@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - QuizMaster</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .auth-card h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .auth-card p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .auth-form {
+            text-align: left;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .auth-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .auth-toggle button {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: #ffe6e6;
+            color: #d32f2f;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #d32f2f;
+        }
+        
+        .success-message {
+            background: #e8f5e8;
+            color: #388e3c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #388e3c;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .forgot-password button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+        
+        .google-btn {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: #333;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .google-btn:hover {
+            border-color: #4285f4;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .firebase-loading {
+            text-align: center;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .firebase-error {
+            text-align: center;
+            padding: 20px;
+            background: rgba(244, 67, 54, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>🎯</h1>
+            <h2 id="auth-title">Welcome to QuizMaster</h2>
+            <p id="auth-subtitle">Sign in to create and manage your quizzes</p>
+            
+            <div id="firebase-loading" class="firebase-loading">
+                <div class="loading"></div>
+                Initializing authentication system...
+            </div>
+            
+            <div id="firebase-error" class="firebase-error" style="display: none;">
+                <h3>Authentication System Error</h3>
+                <p>Unable to connect to authentication service. Please refresh the page.</p>
+                <button onclick="window.location.reload()" class="auth-btn">Refresh Page</button>
+            </div>
+            
+            <div id="message-container"></div>
+            
+            <form id="auth-form" class="auth-form" style="display: none;">
+                <div id="name-group" class="form-group" style="display: none;">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="Enter your full name" maxlength="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required minlength="6">
+                </div>
+                
+                <div id="confirm-password-group" class="form-group" style="display: none;">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" minlength="6">
+                </div>
+                
+                <button type="submit" id="auth-submit-btn" class="auth-btn">
+                    Sign In
+                </button>
+                
+                <div class="divider" style="text-align: center; margin: 20px 0; color: #999;">
+                    or
+                </div>
+                
+                <button type="button" id="google-sign-in" class="google-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continue with Google
+                </button>
+                
+                <div class="forgot-password" id="forgot-password" style="display: none;">
+                    <button type="button" onclick="resetPassword()">Forgot your password?</button>
+                </div>
+            </form>
+            
+            <div class="auth-toggle" id="auth-toggle-section" style="display: none;">
+                <span id="toggle-text">Don't have an account?</span>
+                <button type="button" id="toggle-auth">Sign Up</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2sHk8KwuoJlIBK0ceZxS2IvKgquid04A",
+            authDomain: "quizsystem-fbdb9.firebaseapp.com",
+            databaseURL: "https://quizsystem-fbdb9-default-rtdb.firebaseio.com",
+            projectId: "quizsystem-fbdb9",
+            storageBucket: "quizsystem-fbdb9.firebasestorage.app",
+            messagingSenderId: "637015291465",
+            appId: "1:637015291465:web:893fea9aea38abda6df198",
+            measurementId: "G-QGJM9L11N9"
+        };
+
+        let firebaseAuth = null;
+        let firebaseDatabase = null;
+        let isSignUpMode = false;
+        let isFirebaseReady = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFirebaseAuth();
+        });
+
+        async function initializeFirebaseAuth() {
+            try {
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase SDK not loaded');
+                }
+                
+                firebase.initializeApp(firebaseConfig);
+                
+                firebaseAuth = firebase.auth();
+                firebaseDatabase = firebase.database();
+                
+                await testFirebaseConnection();
+                
+                isFirebaseReady = true;
+                
+                hideElement('firebase-loading');
+                showElement('auth-form');
+                showElement('auth-toggle-section');
+                
+                firebaseAuth.onAuthStateChanged((user) => {
+                    if (user) {
+                        showMessage('Redirecting to dashboard...', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1500);
+                    } else {
+                    }
+                });
+                
+                initializeAuthForm();
+                
+            } catch (error) {
+                showFirebaseError(error);
+            }
+        }
+
+        async function testFirebaseConnection() {
+            return new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Connection timeout'));
+                }, 10000);
+                
+                firebaseDatabase.ref('.info/connected').once('value', (snapshot) => {
+                    clearTimeout(timeout);
+                    const connected = snapshot.val();
+                    resolve(connected);
+                }, (error) => {
+                    clearTimeout(timeout);
+                    reject(error);
+                });
+            });
+        }
+
+        function showFirebaseError(error) {
+            hideElement('firebase-loading');
+            hideElement('auth-form');
+            hideElement('auth-toggle-section');
+            
+            const errorDiv = document.getElementById('firebase-error');
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `
+                <h3>Authentication System Error</h3>
+                <p><strong>Error:</strong> ${error.message}</p>
+                <p>Please refresh the page and try again. If the problem persists, check your internet connection.</p>
+                <button onclick="window.location.reload()" class="auth-btn">Refresh Page</button>
+            `;
+        }
+        
+        function initializeAuthForm() {
+            const form = document.getElementById('auth-form');
+            const toggleBtn = document.getElementById('toggle-auth');
+            const googleBtn = document.getElementById('google-sign-in');
+            
+            if (!form || !toggleBtn || !googleBtn) {
+                return;
+            }
+            
+            form.addEventListener('submit', handleFormSubmit);
+            
+            toggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleAuthMode();
+            });
+            
+            googleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                signInWithGoogle();
+            });
+            
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            
+            if (emailInput) emailInput.addEventListener('input', validateEmail);
+            if (passwordInput) passwordInput.addEventListener('input', validatePassword);
+            if (confirmPasswordInput) confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+        }
+        
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            if (!isFirebaseReady) {
+                showMessage('Authentication system not ready. Please wait...', 'error');
+                return;
+            }
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('fullName').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!validateForm(email, password, fullName, confirmPassword)) {
+                return;
+            }
+            
+            if (isSignUpMode) {
+                signUp(email, password, fullName);
+            } else {
+                signIn(email, password);
+            }
+        }
+        
+        function validateForm(email, password, fullName, confirmPassword) {
+            clearMessages();
+            
+            if (!email || !password) {
+                showMessage('Please fill in all required fields', 'error');
+                return false;
+            }
+            
+            if (!validateEmailFormat(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters long', 'error');
+                return false;
+            }
+            
+            if (isSignUpMode) {
+                if (!fullName) {
+                    showMessage('Please enter your full name', 'error');
+                    return false;
+                }
+                
+                if (password !== confirmPassword) {
+                    showMessage('Passwords do not match', 'error');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        async function signUp(email, password, fullName) {
+            const submitBtn = document.getElementById('auth-submit-btn');
+            setLoading(submitBtn, true);
+            
+            try {
+                if (!firebaseAuth) {
+                    throw new Error('Firebase Auth not initialized');
+                }
+                
+                const userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                await user.updateProfile({
+                    displayName: fullName
+                });
+                
+                if (firebaseDatabase) {
+                    await firebaseDatabase.ref(`users/${user.uid}`).set({
+                        email: email,
+                        displayName: fullName,
+                        createdAt: Date.now(),
+                        lastLogin: Date.now(),
+                        quizCount: 0,
+                        totalPlays: 0
+                    });
+                }
+                
+                showMessage('Account created successfully! Redirecting...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+                
+            } catch (error) {
+                showMessage(getErrorMessage(error.code), 'error');
+            } finally {
+                setLoading(submitBtn, false);
+            }
+        }
+        
+        async function signIn(email, password) {
+            const submitBtn = document.getElementById('auth-submit-btn');
+            setLoading(submitBtn, true);
+            
+            try {
+                if (!firebaseAuth) {
+                    throw new Error('Firebase Auth not initialized');
+                }
+                
+                const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                if (firebaseDatabase) {
+                    await firebaseDatabase.ref(`users/${user.uid}`).update({
+                        lastLogin: Date.now()
+                    });
+                }
+                
+                showMessage('Signed in successfully! Redirecting...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+                
+            } catch (error) {
+                showMessage(getErrorMessage(error.code), 'error');
+            } finally {
+                setLoading(submitBtn, false);
+            }
+        }
+        
+        async function signInWithGoogle() {
+            const googleBtn = document.getElementById('google-sign-in');
+            setLoading(googleBtn, true);
+            
+            try {
+                if (!firebaseAuth) {
+                    throw new Error('Firebase Auth not initialized');
+                }
+                
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.addScope('email');
+                provider.addScope('profile');
+                
+                const result = await firebaseAuth.signInWithPopup(provider);
+                const user = result.user;
+                
+                const isNewUser = result.additionalUserInfo?.isNewUser;
+                
+                if (isNewUser && firebaseDatabase) {
+                    await firebaseDatabase.ref(`users/${user.uid}`).set({
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        createdAt: Date.now(),
+                        lastLogin: Date.now(),
+                        quizCount: 0,
+                        totalPlays: 0,
+                        provider: 'google'
+                    });
+                } else if (firebaseDatabase) {
+                    await firebaseDatabase.ref(`users/${user.uid}`).update({
+                        lastLogin: Date.now()
+                    });
+                }
+                
+                showMessage('Signed in with Google successfully! Redirecting...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+                
+            } catch (error) {
+                if (error.code !== 'auth/popup-closed-by-user') {
+                    showMessage('Failed to sign in with Google: ' + error.message, 'error');
+                }
+            } finally {
+                setLoading(googleBtn, false);
+            }
+        }
+        
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleText = document.getElementById('toggle-text');
+            const toggleBtn = document.getElementById('toggle-auth');
+            const nameGroup = document.getElementById('name-group');
+            const confirmPasswordGroup = document.getElementById('confirm-password-group');
+            const forgotPassword = document.getElementById('forgot-password');
+            
+            if (isSignUpMode) {
+                title.textContent = 'Create Account';
+                subtitle.textContent = 'Join QuizMaster to start creating amazing quizzes';
+                submitBtn.textContent = 'Sign Up';
+                toggleText.textContent = 'Already have an account?';
+                toggleBtn.textContent = 'Sign In';
+                nameGroup.style.display = 'block';
+                confirmPasswordGroup.style.display = 'block';
+                forgotPassword.style.display = 'none';
+            } else {
+                title.textContent = 'Welcome Back';
+                subtitle.textContent = 'Sign in to continue to QuizMaster';
+                submitBtn.textContent = 'Sign In';
+                toggleText.textContent = "Don't have an account?";
+                toggleBtn.textContent = 'Sign Up';
+                nameGroup.style.display = 'none';
+                confirmPasswordGroup.style.display = 'none';
+                forgotPassword.style.display = 'block';
+            }
+            
+            clearMessages();
+            clearForm();
+        }
+        
+        async function resetPassword() {
+            const email = document.getElementById('email').value.trim();
+            
+            if (!email) {
+                showMessage('Please enter your email address first', 'error');
+                return;
+            }
+            
+            if (!validateEmailFormat(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            if (!firebaseAuth) {
+                showMessage('Authentication system not ready', 'error');
+                return;
+            }
+            
+            try {
+                await firebaseAuth.sendPasswordResetEmail(email);
+                showMessage('Password reset email sent! Check your inbox.', 'success');
+            } catch (error) {
+                showMessage(getErrorMessage(error.code), 'error');
+            }
+        }
+        
+        function validateEmail() {
+            const email = document.getElementById('email').value.trim();
+            const emailInput = document.getElementById('email');
+            
+            if (email && !validateEmailFormat(email)) {
+                emailInput.style.borderColor = '#f44336';
+            } else {
+                emailInput.style.borderColor = '#ddd';
+            }
+        }
+        
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const passwordInput = document.getElementById('password');
+            
+            if (password && password.length < 6) {
+                passwordInput.style.borderColor = '#f44336';
+            } else {
+                passwordInput.style.borderColor = '#ddd';
+            }
+        }
+        
+        function validateConfirmPassword() {
+            if (!isSignUpMode) return;
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            
+            if (confirmPassword && password !== confirmPassword) {
+                confirmPasswordInput.style.borderColor = '#f44336';
+            } else {
+                confirmPasswordInput.style.borderColor = '#ddd';
+            }
+        }
+        
+        function validateEmailFormat(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function showMessage(message, type) {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `
+                <div class="${type}-message">
+                    ${message}
+                </div>
+            `;
+        }
+        
+        function clearMessages() {
+            document.getElementById('message-container').innerHTML = '';
+        }
+        
+        function clearForm() {
+            document.getElementById('auth-form').reset();
+            const inputs = document.querySelectorAll('.form-group input');
+            inputs.forEach(input => {
+                input.style.borderColor = '#ddd';
+            });
+        }
+        
+        function setLoading(button, loading) {
+            if (loading) {
+                button.disabled = true;
+                const originalText = button.textContent;
+                button.setAttribute('data-original-text', originalText);
+                button.innerHTML = `
+                    <span class="loading"></span>
+                    ${originalText}
+                `;
+            } else {
+                button.disabled = false;
+                const originalText = button.getAttribute('data-original-text') || button.textContent.replace(/.*?(\w+\s*\w*)$/, '$1');
+                button.innerHTML = originalText;
+            }
+        }
+        
+        function getErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/user-not-found':
+                    return 'No account found with this email address.';
+                case 'auth/wrong-password':
+                    return 'Incorrect password. Please try again.';
+                case 'auth/email-already-in-use':
+                    return 'An account with this email already exists.';
+                case 'auth/weak-password':
+                    return 'Password should be at least 6 characters long.';
+                case 'auth/invalid-email':
+                    return 'Please enter a valid email address.';
+                case 'auth/too-many-requests':
+                    return 'Too many failed attempts. Please try again later.';
+                case 'auth/network-request-failed':
+                    return 'Network error. Please check your connection.';
+                case 'auth/popup-blocked':
+                    return 'Popup was blocked. Please allow popups and try again.';
+                case 'auth/popup-closed-by-user':
+                    return 'Sign-in popup was closed. Please try again.';
+                default:
+                    return 'An error occurred: ' + (errorCode || 'Unknown error');
+            }
+        }
+
+        function hideElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) element.style.display = 'none';
+        }
+
+        function showElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) element.style.display = 'block';
+        }
+        
+        window.toggleAuthMode = toggleAuthMode;
+        window.resetPassword = resetPassword;
+        
+    </script>
+</body>
+</html>

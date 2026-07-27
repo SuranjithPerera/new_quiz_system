@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master! - Interactive Quiz Game</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Quiz Master!</h1>
+            <p>The Ultimate Interactive Quiz Experience</p>
+        </header>
+
+        <div id="user-status"></div>
+
+        <div id="admin-access" style="display:none;text-align:center;margin:40px 0;">
+            <button class="btn" id="admin-panel-btn" style="background: linear-gradient(135deg, #ff6900 0%, #ffb800 100%); border: 3px solid #ffffff; color: white; padding: 18px 30px; border-radius: 30px; font-weight: 900; font-size: 1.2rem; box-shadow: 0 12px 35px rgba(255, 105, 0, 0.4); transition: all 0.3s ease; text-transform: none;">
+                🔧 Go to Admin Dashboard
+            </button>
+        </div>
+
+        <div class="main-menu">
+            <div class="menu-card">
+                <h2>🎯 Join Game</h2>
+                <p>Enter a game PIN to join an active quiz</p>
+                
+                <div class="input-group">
+                    <input type="text" id="game-pin-input" placeholder="Enter Game PIN" maxlength="6">
+                    <input type="text" id="player-name-input" placeholder="Your Name" maxlength="20">
+                </div>
+                
+                <button class="btn btn-primary" onclick="joinGame()">Join Game</button>
+            </div>
+
+            <div class="menu-card">
+                <h2>🎪 Host Game</h2>
+                <p>Create and host a quiz game for others to join</p>
+                
+                <button class="btn btn-secondary" onclick="hostGame()">Host Game</button>
+            </div>
+
+            <div class="menu-card">
+                <h2>📚 Manage Quizzes</h2>
+                <p>Create, edit, and organize your quiz collections</p>
+                
+                <button class="btn btn-tertiary" onclick="manageQuizzes()">Manage Quizzes</button>
+            </div>
+
+        </div>
+
+        <div class="menu-card" style="margin-top: 20px;">
+            <h2>👤 Account</h2>
+            <div id="auth-section">
+                <p>Sign in to save your quizzes and track your progress</p>
+                <button class="btn btn-secondary" onclick="window.location.href='auth.html'">Sign In / Sign Up</button>
+            </div>
+        </div>
+
+        <div id="status-message" class="status-message"></div>
+
+        <footer style="text-align: center; margin-top: 60px; padding: 20px; opacity: 0.8;">
+            <p>&copy; 2025 Quiz Master! - Built with ❤️ for interactive learning</p>
+        </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        function showAdminButton() {
+            document.getElementById('admin-access').style.display = 'block';
+        }
+
+        function hideAdminButton() {
+            document.getElementById('admin-access').style.display = 'none';
+        }
+
+        function testIfAdmin(user) {
+            return Promise.resolve(!!user);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const adminBtn = document.getElementById('admin-panel-btn');
+            adminBtn.addEventListener('click', () => {
+                window.location.href = 'admin.html';
+            });
+            
+            adminBtn.addEventListener('mouseenter', () => {
+                adminBtn.style.transform = 'translateY(-3px)';
+                adminBtn.style.boxShadow = '0 18px 45px rgba(255, 105, 0, 0.6)';
+            });
+            
+            adminBtn.addEventListener('mouseleave', () => {
+                adminBtn.style.transform = 'translateY(0)';
+                adminBtn.style.boxShadow = '0 12px 35px rgba(255, 105, 0, 0.4)';
+            });
+
+            const checkAuth = () => {
+                if (typeof auth === 'undefined') {
+                    setTimeout(checkAuth, 100);
+                    return;
+                }
+
+                if (auth.currentUser) {
+                    testIfAdmin(auth.currentUser).then(isAdmin => {
+                        if (isAdmin) showAdminButton();
+                    });
+                }
+
+                auth.onAuthStateChanged(user => {
+                    updateAuthSection(user);
+                    
+                    if (!user) {
+                        hideAdminButton();
+                        return;
+                    }
+                    
+                    testIfAdmin(user).then(isAdmin => {
+                        if (isAdmin) {
+                            showAdminButton();
+                        } else {
+                            hideAdminButton();
+                        }
+                    });
+                });
+            };
+
+            checkAuth();
+        });
+
+        function updateAuthSection(user) {
+            const authSection = document.getElementById('auth-section');
+            if (user) {
+                authSection.innerHTML = `
+                    <div class="user-info" style="text-align: center;">
+                        <p>Welcome, <strong>${user.displayName || user.email}</strong>!</p>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="window.location.href='manage.html'" style="flex: 1; min-width: 120px;">My Quizzes</button>
+                            <button class="btn btn-secondary" onclick="signOut()" style="flex: 1; min-width: 120px;">Sign Out</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                authSection.innerHTML = `
+                    <p>Sign in to save your quizzes and track your progress</p>
+                    <button class="btn btn-secondary" onclick="window.location.href='auth.html'">Sign In / Sign Up</button>
+                `;
+            }
+        }
+
+        function joinGame() {
+            const gamePin = document.getElementById('game-pin-input').value.trim();
+            const playerName = document.getElementById('player-name-input').value.trim();
+
+            if (!gamePin) {
+                showStatus('Please enter a game PIN', 'error');
+                return;
+            }
+
+            if (!playerName) {
+                showStatus('Please enter your name', 'error');
+                return;
+            }
+
+            if (gamePin.length !== 6) {
+                showStatus('Game PIN must be 6 digits', 'error');
+                return;
+            }
+
+            localStorage.setItem('gamePin', gamePin);
+            localStorage.setItem('playerName', playerName);
+
+            window.location.href = 'player.html';
+        }
+
+        function hostGame() {
+            window.location.href = 'host.html';
+        }
+
+        function manageQuizzes() {
+            window.location.href = 'manage.html';
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            
+            setTimeout(() => {
+                statusEl.textContent = '';
+                statusEl.className = 'status-message';
+            }, 3000);
+        }
+
+        async function signOut() {
+            try {
+                if (typeof auth !== 'undefined' && auth.signOut) {
+                    await auth.signOut();
+                    showStatus('Signed out successfully', 'success');
+                }
+            } catch (error) {
+                showStatus('Error signing out', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

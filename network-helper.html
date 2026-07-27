@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizMaster - Network Launcher</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        header {
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card h2 {
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        
+        .server-status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .status-unknown {
+            background: rgba(255, 193, 7, 0.3);
+            border: 2px solid #ffc107;
+        }
+        
+        .status-running {
+            background: rgba(76, 175, 80, 0.3);
+            border: 2px solid #4caf50;
+        }
+        
+        .status-offline {
+            background: rgba(244, 67, 54, 0.3);
+            border: 2px solid #f44336;
+        }
+        
+        .connection-info {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+        
+        .btn-tertiary {
+            background: linear-gradient(45deg, #ffa726, #fb8c00);
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            margin: 5px;
+        }
+        
+        .qr-section {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+        
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .devices-section {
+            grid-column: 1 / -1;
+        }
+        
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .device-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .ping-result {
+            margin-top: 10px;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .notification.error {
+            background: #f44336;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 QuizMaster Network Launcher</h1>
+            <p>Set up local network access for your quiz game</p>
+        </header>
+        
+        <div class="main-grid">
+            <div class="card">
+                <h2>🖥️ Host Dashboard</h2>
+                <div id="server-status" class="server-status status-unknown">
+                    🔍 Checking server status...
+                </div>
+                
+                <div class="connection-info" id="connection-info">
+                    <strong>Local:</strong> http://localhost:8000<br>
+                    <strong>Network:</strong> <span id="network-address">Detecting...</span>
+                </div>
+                
+                <button class="btn" onclick="openQuizMaster()">🎮 Open QuizMaster</button>
+                <button class="btn btn-secondary" onclick="testConnections()">🔍 Test Connection</button>
+                <button class="btn btn-small btn-tertiary" onclick="copyAddress()">📋 Copy Network Address</button>
+                <button class="btn btn-small btn-tertiary" onclick="refreshStatus()">🔄 Refresh</button>
+            </div>
+            
+            <div class="card">
+                <h2>📱 Player Access</h2>
+                
+                <div class="qr-section" id="qr-section" style="display: none;">
+                    <div id="qr-code"></div>
+                    <p><strong>Scan to join on mobile</strong></p>
+                </div>
+                
+                <button class="btn btn-secondary" onclick="generateQR()">📱 Generate QR Code</button>
+                <button class="btn btn-tertiary" onclick="openPlayerView()">👤 Test Player View</button>
+                
+                <div class="instructions">
+                    <h3>For Players:</h3>
+                    <div class="step">1. Connect to the same WiFi network</div>
+                    <div class="step">2. Open the network address above</div>
+                    <div class="step">3. Enter game PIN to join quiz</div>
+                </div>
+            </div>
+            
+            <div class="card devices-section">
+                <h2>🌐 Network Devices</h2>
+                <p>Testing connectivity to common local server addresses...</p>
+                <div class="device-grid" id="device-grid">
+                </div>
+                <button class="btn btn-secondary" onclick="scanNetwork()">🔍 Scan Network</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🚀 Quick Server Setup</h2>
+            <div class="instructions">
+                <h3>Choose your preferred method:</h3>
+                
+                <div class="step">
+                    <strong>🎯 VS Code:</strong><br>
+                    1. Install VS Code + Live Server extension<br>
+                    2. Right-click index.html → "Open with Live Server"<br>
+                    3. Server starts automatically!
+                </div>
+                
+                <div class="step">
+                    <strong>🐍 Python:</strong><br>
+                    Open terminal in quiz folder: <code>python -m http.server 8000</code>
+                </div>
+                
+                <div class="step">
+                    <strong>📦 Node.js:</strong><br>
+                    Install: <code>npm install -g http-server</code><br>
+                    Run: <code>http-server -p 8000</code>
+                </div>
+                
+                <div class="step">
+                    <strong>🔧 Alternative Tools:</strong><br>
+                    • Mongoose<br>
+                    • XAMPP/WAMP<br>
+                    • "Web Server for Chrome" extension
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+
+    <script>
+        let currentIP = '';
+        let serverPort = 8000;
+        let checkInterval;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            detectNetworkIP();
+            checkServerStatus();
+            populateDeviceGrid();
+            
+            checkInterval = setInterval(checkServerStatus, 5000);
+        });
+        
+        async function detectNetworkIP() {
+            try {
+                const pc = new RTCPeerConnection({
+                    iceServers: [{urls: 'stun:stun.l.google.com:19302'}]
+                });
+                
+                pc.createDataChannel('');
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                
+                pc.onicecandidate = event => {
+                    if (event.candidate) {
+                        const candidate = event.candidate.candidate;
+                        const ipMatch = candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+                        if (ipMatch && !ipMatch[1].startsWith('127.') && !ipMatch[1].startsWith('169.254.')) {
+                            currentIP = ipMatch[1];
+                            updateNetworkAddress();
+                            pc.close();
+                        }
+                    }
+                };
+                
+                setTimeout(() => {
+                    if (!currentIP) {
+                        currentIP = 'YOUR_LOCAL_IP';
+                        updateNetworkAddress();
+                    }
+                    pc.close();
+                }, 3000);
+                
+            } catch (error) {
+                currentIP = 'YOUR_LOCAL_IP';
+                updateNetworkAddress();
+            }
+        }
+        
+        function updateNetworkAddress() {
+            const networkAddr = document.getElementById('network-address');
+            if (currentIP === 'YOUR_LOCAL_IP') {
+                networkAddr.innerHTML = `<span style="color: orange;">Find your IP with "ipconfig" command</span>`;
+            } else {
+                networkAddr.textContent = `http://${currentIP}:${serverPort}`;
+            }
+        }
+        
+        async function checkServerStatus() {
+            const statusDiv = document.getElementById('server-status');
+            
+            try {
+                const response = await fetch(`http://localhost:${serverPort}`, { 
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                
+                statusDiv.className = 'server-status status-running';
+                statusDiv.textContent = '✅ Server is running on port ' + serverPort;
+                
+            } catch (error) {
+                const ports = [8000, 3000, 8080, 5000, 8081];
+                let foundPort = null;
+                
+                for (const port of ports) {
+                    try {
+                        await fetch(`http://localhost:${port}`, { 
+                            method: 'HEAD',
+                            mode: 'no-cors'
+                        });
+                        foundPort = port;
+                        break;
+                    } catch (e) {
+                    }
+                }
+                
+                if (foundPort) {
+                    serverPort = foundPort;
+                    statusDiv.className = 'server-status status-running';
+                    statusDiv.textContent = `✅ Server found on port ${foundPort}`;
+                    updateNetworkAddress();
+                } else {
+                    statusDiv.className = 'server-status status-offline';
+                    statusDiv.textContent = '❌ No server detected. Please start a local server.';
+                }
+            }
+        }
+        
+        function populateDeviceGrid() {
+            const grid = document.getElementById('device-grid');
+            const commonAddresses = [
+                'localhost:8000',
+                'localhost:3000', 
+                'localhost:8080',
+                'localhost:5000',
+                'localhost:8081'
+            ];
+            
+            commonAddresses.forEach(addr => {
+                const device = document.createElement('div');
+                device.className = 'device-item';
+                device.innerHTML = `
+                    <strong>${addr}</strong>
+                    <div class="ping-result" id="ping-${addr.replace(':', '-')}">Testing...</div>
+                `;
+                grid.appendChild(device);
+                
+                testAddress(addr);
+            });
+        }
+        
+        async function testAddress(address) {
+            const resultId = `ping-${address.replace(':', '-')}`;
+            const resultDiv = document.getElementById(resultId);
+            
+            try {
+                const start = Date.now();
+                await fetch(`http://${address}`, { 
+                    method: 'HEAD',
+                    mode: 'no-cors',
+                    timeout: 3000
+                });
+                const time = Date.now() - start;
+                
+                resultDiv.textContent = `✅ ${time}ms`;
+                resultDiv.style.background = 'rgba(76, 175, 80, 0.3)';
+                
+            } catch (error) {
+                resultDiv.textContent = '❌ Offline';
+                resultDiv.style.background = 'rgba(244, 67, 54, 0.3)';
+            }
+        }
+        
+        function openQuizMaster() {
+            const url = `http://localhost:${serverPort}/index.html`;
+            window.open(url, '_blank');
+        }
+        
+        function openPlayerView() {
+            const url = `http://localhost:${serverPort}/index.html`;
+            window.open(url, '_blank');
+        }
+        
+        function copyAddress() {
+            const address = currentIP !== 'YOUR_LOCAL_IP' ? 
+                `http://${currentIP}:${serverPort}` : 
+                `http://localhost:${serverPort}`;
+                
+            navigator.clipboard.writeText(address).then(() => {
+                showNotification('Address copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Please copy manually: ' + address, 'error');
+            });
+        }
+        
+        function generateQR() {
+            const qrSection = document.getElementById('qr-section');
+            const qrCode = document.getElementById('qr-code');
+            
+            if (currentIP === 'YOUR_LOCAL_IP') {
+                showNotification('Please detect your IP address first', 'error');
+                return;
+            }
+            
+            const url = `http://${currentIP}:${serverPort}`;
+            
+            qrCode.innerHTML = `
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" 
+                     alt="QR Code" style="max-width: 100%; height: auto;">
+            `;
+            qrSection.style.display = 'block';
+            
+            showNotification('QR code generated!', 'success');
+        }
+        
+        async function testConnections() {
+            showNotification('Testing connections...', 'success');
+            await checkServerStatus();
+            populateDeviceGrid();
+        }
+        
+        function refreshStatus() {
+            detectNetworkIP();
+            checkServerStatus();
+            showNotification('Status refreshed!', 'success');
+        }
+        
+        function scanNetwork() {
+            showNotification('Scanning network...', 'success');
+            populateDeviceGrid();
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        window.addEventListener('beforeunload', () => {
+            if (checkInterval) {
+                clearInterval(checkInterval);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master! - Admin Dashboard</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚙️ Admin Dashboard</h1>
+            <p>System Overview & Management</p>
+        </header>
+
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <p>Loading admin dashboard...</p>
+        </div>
+
+        <div id="access-denied" class="access-denied" style="display: none;">
+            <div class="denied-card">
+                <h2>⛔ Access Denied</h2>
+                <p>Please sign in to access the admin dashboard.</p>
+                <button class="btn btn-primary" onclick="window.location.href='auth.html'">
+                    Sign In
+                </button>
+            </div>
+        </div>
+
+        <div id="admin-content" class="admin-dashboard" style="display: none;">
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🎮</div>
+                    <div class="stat-content">
+                        <h3 id="total-games">0</h3>
+                        <p>Total Games</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-content">
+                        <h3 id="active-games">0</h3>
+                        <p>Active Games</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="switchTab('games')">🎮 Games</button>
+            </div>
+
+            <div id="games-tab" class="tab-content active">
+                <div class="section-header">
+                    <h2>🎮 Game Activity</h2>
+                    <div class="game-filters">
+                        <select id="game-status-filter" onchange="filterGames()">
+                            <option value="all">All Games</option>
+                            <option value="waiting">Waiting</option>
+                            <option value="playing">Playing</option>
+                            <option value="finished">Finished</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="games-list" id="games-list">
+                    <div class="loading-item">Loading games...</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="admin-status" class="status-message"></div>
+
+        <div id="players-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('players-modal')">&times;</span>
+                <h2>Game Players</h2>
+                <div id="players-content"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
