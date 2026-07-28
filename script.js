@@ -149,7 +149,8 @@ class QuizGame {
                 },
                 players: {},
                 createdAt: Date.now(),
-                hostId: this.generatePlayerId()
+                hostId: this.generatePlayerId(),
+                hostUid: typeof auth !== 'undefined' && auth.currentUser ? auth.currentUser.uid : null
             };
 
             const gameRef = db.ref(`games/${this.gamePin}`);

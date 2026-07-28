@@ -88,7 +88,7 @@ async function initDashboard() {
         renderGames();
         hide('loading-screen'); 
         show('admin-content');
-        toast('Admin dashboard ready', 'success');
+        toast('Dashboard ready', 'success');
         realTimeGames();
     } catch (e) {
         toast('Error loading dashboard', 'error');
@@ -99,15 +99,19 @@ async function loadGames() {
     adminData.games = [];
     const snap = await database.ref('games').once('value');
     const obj = snap.val() || {};
+    const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+
     Object.entries(obj).forEach(([pin, data]) => {
-        adminData.games.push({
-            gamePin: pin,
-            quiz: data.quiz || {},
-            gameState: data.gameState || {},
-            createdAt: data.createdAt || 0,
-            players: data.players ? Object.values(data.players) : [],
-            playerCount: data.players ? Object.keys(data.players).length : 0
-        });
+        if (data.hostUid === currentUserId) {
+            adminData.games.push({
+                gamePin: pin,
+                quiz: data.quiz || {},
+                gameState: data.gameState || {},
+                createdAt: data.createdAt || 0,
+                players: data.players ? Object.values(data.players) : [],
+                playerCount: data.players ? Object.keys(data.players).length : 0
+            });
+        }
     });
 }
 
@@ -194,9 +198,14 @@ window.endGame = async pin => {
 function realTimeGames() {
     let first = true;
     const ref = database.ref('games');
+    const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+
     ref.on('child_added', snap => {
         if (first) return;          
         const pin = snap.key, data = snap.val();
+        
+        if (data.hostUid !== currentUserId) return;
+        
         if (adminData.games.find(g => g.gamePin === pin)) return;      
         adminData.games.unshift({
             gamePin: pin, 
@@ -210,8 +219,12 @@ function realTimeGames() {
         renderStats(); 
         renderGames();
     });
+    
     ref.on('child_changed', snap => {
         const pin = snap.key, data = snap.val();
+        
+        if (data.hostUid !== currentUserId) return;
+        
         const idx = adminData.games.findIndex(g => g.gamePin === pin);
         if (idx > -1) {
             adminData.games[idx] = { 
@@ -227,12 +240,14 @@ function realTimeGames() {
             renderGames();
         }
     });
+    
     ref.on('child_removed', snap => {
         adminData.games = adminData.games.filter(g => g.gamePin !== snap.key);
         calcStats(); 
         renderStats(); 
         renderGames();
     });
+    
     setTimeout(() => { first = false; }, 1500);   
 }
 
