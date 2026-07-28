@@ -12,6 +12,8 @@
             cursor: pointer !important;
             position: relative !important;
             z-index: 100 !important;
+            background: initial !important;
+            border: initial !important;
         }
 
         button:disabled, .btn:disabled {
@@ -468,10 +470,17 @@
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #666;
+            color: #ffffff;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             margin: 20px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-state p {
+            margin: 5px 0;
         }
 
         .empty-state button {
