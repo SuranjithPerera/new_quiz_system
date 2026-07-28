@@ -179,7 +179,8 @@ class SessionManager {
             sessionId: this.generateSessionId(),
             createdAt: Date.now(),
             lastUpdated: Date.now(),
-            isGuest: true
+            isGuest: true,
+            userId: null
         };
         this.saveSession();
     }
@@ -267,9 +268,15 @@ class SessionManager {
             const quizzes = await this.getFirebaseQuizzes(user.uid);
 
             const localQuizzes = sessionData.quizzes || [];
-            const mergedQuizzes = this.mergeQuizzes(localQuizzes, quizzes);
+            
+            let finalQuizzes;
+            if (sessionData.isGuest || !sessionData.userId || sessionData.userId === user.uid) {
+                finalQuizzes = this.mergeQuizzes(localQuizzes, quizzes);
+            } else {
+                finalQuizzes = quizzes;
+            }
 
-            sessionData.quizzes = mergedQuizzes;
+            sessionData.quizzes = finalQuizzes;
             sessionData.stats = userData.stats || sessionData.stats || { quizCount: 0, totalPlays: 0 };
             sessionData.userData = userData;
             sessionData.isGuest = false;
@@ -278,7 +285,7 @@ class SessionManager {
 
             this.saveSession();
 
-            return { success: true, quizzes: mergedQuizzes, userData };
+            return { success: true, quizzes: finalQuizzes, userData };
 
         } catch (error) {
             return { success: false, error: error.message };
@@ -349,6 +356,11 @@ async function setupAuthStateListener() {
                 currentUser = user;
                 
                 if (user) {
+                    const storedUserId = localStorage.getItem('userId');
+                    if (storedUserId && storedUserId !== user.uid) {
+                        sessionManager.clearSession();
+                    }
+
                     localStorage.setItem('userEmail', user.email);
                     localStorage.setItem('userName', user.displayName || user.email);
                     localStorage.setItem('userId', user.uid);
@@ -492,11 +504,12 @@ async function deleteQuizFromSystem(quizId) {
 
 async function signOut() {
     try {
+        sessionManager.saveRecoveryCheckpoint();
+        sessionManager.clearSession();
+        
         if (auth && typeof auth.signOut === 'function') {
             await auth.signOut();
         }
-        
-        sessionManager.clearSession();
     } catch (error) {
     }
 }

@@ -201,6 +201,14 @@
 
         async function signOut() {
             try {
+                if (typeof sessionManager !== 'undefined') {
+                    sessionManager.clearSession();
+                }
+                
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userId');
+                
                 if (typeof auth !== 'undefined' && auth.signOut) {
                     await auth.signOut();
                     showStatus('Signed out successfully', 'success');
