@@ -301,6 +301,11 @@
     color: #e21b3c;
 }
 
+#players-content {
+    overflow-x: auto;
+    width: 100%;
+}
+
 #players-content table {
     width: 100%;
     border-collapse: collapse;
