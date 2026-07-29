@@ -371,9 +371,6 @@
             100% { box-shadow: 0 25px 70px rgba(70, 23, 143, 0.6), 0 0 40px rgba(156, 77, 255, 0.3); }
         }
 
-        /* =========================================
-           PODIUM STYLES (KAHOOT STYLE)
-           ========================================= */
         .podium-container {
             display: flex;
             justify-content: center;
@@ -634,6 +631,11 @@
     <script src="script.js"></script>
     
     <script>
+        const sanitizeHTML = str => {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
+        };
+
         let hostCurrentQuiz = null;
         let hostGameInstance = null;
         let hostPlayers = {};
@@ -673,8 +675,8 @@
             const userHeaderHTML = `
                 <div class="user-header" style="position: fixed; top: 15px; right: 15px; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #ff6900 0%, #ffb800 100%); backdrop-filter: blur(15px); padding: 12px 20px; border-radius: 30px; border: 3px solid rgba(255, 255, 255, 0.3); z-index: 1000; box-shadow: 0 8px 32px rgba(255, 105, 0, 0.3);">
                     <div class="user-info" style="color: white; font-size: 14px; text-align: right; font-weight: 600;">
-                        <div class="user-name" style="font-weight: 800; margin-bottom: 2px; color: #ffffff;">${user.displayName || user.email.split('@')[0]}</div>
-                        <div class="user-email" style="opacity: 0.9; font-size: 11px; color: #ffe6d1;">${user.email}</div>
+                        <div class="user-name" style="font-weight: 800; margin-bottom: 2px; color: #ffffff;">${sanitizeHTML(user.displayName || user.email.split('@')[0])}</div>
+                        <div class="user-email" style="opacity: 0.9; font-size: 11px; color: #ffe6d1;">${sanitizeHTML(user.email)}</div>
                     </div>
                     <button onclick="signOut()" style="background: linear-gradient(135deg, #46178f 0%, #7b2cbf 100%); border: none; color: white; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 700; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(70, 23, 143, 0.3);">Sign Out</button>
                 </div>
@@ -746,12 +748,12 @@
             
             quizCard.innerHTML = `
                 <div style="text-align: left;">
-                    <h3>${quiz.title}</h3>
+                    <h3>${sanitizeHTML(quiz.title)}</h3>
                     <p>${questionsCount} question${questionsCount !== 1 ? 's' : ''}</p>
                     <p><small><strong>${typeLabel}</strong></small></p>
                     ${quiz.createdAt ? `<p><small>Created: ${new Date(quiz.createdAt).toLocaleDateString()}</small></p>` : ''}
                 </div>
-                <button onclick="selectQuiz('${quiz.id}', '${type}')" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Select Quiz</button>
+                <button onclick="selectQuiz('${sanitizeHTML(quiz.id)}', '${type}')" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Select Quiz</button>
             `;
             
             container.appendChild(quizCard);
@@ -966,7 +968,7 @@
             
             document.getElementById('current-q-num').textContent = hostCurrentQuestionIndex + 1;
             document.getElementById('total-questions').textContent = totalQuestions;
-            document.getElementById('host-question').textContent = question.question;
+            document.getElementById('host-question').textContent = sanitizeHTML(question.question);
             
             const answersContainer = document.getElementById('host-answers');
             answersContainer.innerHTML = '';
@@ -977,7 +979,7 @@
                 answerDiv.setAttribute('data-index', index);
                 answerDiv.innerHTML = `
                     <span class="answer-letter">${String.fromCharCode(65 + index)}</span>
-                    <span class="answer-text">${answer}</span>
+                    <span class="answer-text">${sanitizeHTML(answer)}</span>
                 `;
                 answersContainer.appendChild(answerDiv);
             });
@@ -1139,7 +1141,7 @@
                 
                 responseDiv.innerHTML = `
                     <div class="player-response-header">
-                        <span class="player-name">${player.name}</span>
+                        <span class="player-name">${sanitizeHTML(player.name)}</span>
                         <span class="player-total-score">${player.score || 0} pts total</span>
                     </div>
                     <span class="response-status ${statusClass}">${statusText}</span>
@@ -1179,9 +1181,6 @@
             } catch (error) { showStatus('Error moving to next question', 'error'); }
         }
 
-        // =========================================
-        // KAHOOT STYLE PODIUM RENDER LOGIC
-        // =========================================
         function showResults() {
             if (hostQuestionTimer) clearInterval(hostQuestionTimer);
             hideElement('active-game');
@@ -1212,7 +1211,7 @@
                 others.forEach((player, index) => {
                     html += `
                         <div class="player-score">
-                            <span class="player-name">#${index + 4} ${player.name}</span>
+                            <span class="player-name">#${index + 4} ${sanitizeHTML(player.name)}</span>
                             <span class="player-points">${player.score || 0} pts</span>
                         </div>
                     `;
@@ -1224,15 +1223,14 @@
         }
 
         function createPodiumSpot(player, rank) {
-            // Generates a cute animated SVG character using dicebear based on the student's name
             const fallbackAvatar = `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(player.name)}`;
 
             return `
                 <div class="podium-spot rank-${rank}">
                     <div class="avatar-container">
-                        <img src="${fallbackAvatar}" alt="${player.name}" class="dummy-gif">
+                        <img src="${fallbackAvatar}" alt="${sanitizeHTML(player.name)}" class="dummy-gif">
                     </div>
-                    <div class="podium-name">${player.name}</div>
+                    <div class="podium-name">${sanitizeHTML(player.name)}</div>
                     <div class="podium-score">${player.score} pts</div>
                     <div class="podium-bar">
                         <span class="rank-number">${rank}</span>
@@ -1240,7 +1238,6 @@
                 </div>
             `;
         }
-        // =========================================
 
         async function endQuiz() {
             if (hostQuestionTimer) clearInterval(hostQuestionTimer);
