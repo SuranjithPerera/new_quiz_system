@@ -3,14 +3,19 @@ const SESSION_MINUTES = 60;
 
 let adminData = { games: [], stats: {} };
 
+const sanitizeHTML = str => {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
+};
+
 function saveSession(uid, email) {
     const data = { uid, email, exp: Date.now() + SESSION_MINUTES * 60 * 1000 };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
 }
 
 function hasValidSession() {
     try {
-        const d = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+        const d = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
         return d && Date.now() < d.exp;
     } catch { 
         return false; 
@@ -18,7 +23,7 @@ function hasValidSession() {
 }
 
 function clearSession() { 
-    localStorage.removeItem(SESSION_KEY); 
+    sessionStorage.removeItem(SESSION_KEY); 
 }
 
 const $ = id => document.getElementById(id);
@@ -136,15 +141,15 @@ function renderGames() {
     list.innerHTML = adminData.games.map(g => `
         <div class="game-item">
             <div class="game-info">
-                <div class="game-pin-admin">PIN: ${g.gamePin}</div>
-                <div>Quiz: ${g.quiz.title || 'Untitled'}</div>
+                <div class="game-pin-admin">PIN: ${sanitizeHTML(g.gamePin)}</div>
+                <div>Quiz: ${sanitizeHTML(g.quiz.title) || 'Untitled'}</div>
                 <div>Players: ${g.playerCount}</div>
                 <div>Created: ${fmtDate(g.createdAt)}</div>
             </div>
-            <div><span class="game-status-admin ${g.gameState.status || 'unknown'}">${(g.gameState.status || 'unknown').toUpperCase()}</span></div>
+            <div><span class="game-status-admin ${sanitizeHTML(g.gameState.status) || 'unknown'}">${(sanitizeHTML(g.gameState.status) || 'unknown').toUpperCase()}</span></div>
             <div>
-                <button class="action-btn" onclick="viewPlayers('${g.gamePin}')">View Players</button>
-                <button class="action-btn danger" onclick="endGame('${g.gamePin}')">End</button>
+                <button class="action-btn" onclick="viewPlayers('${sanitizeHTML(g.gamePin)}')">View Players</button>
+                <button class="action-btn danger" onclick="endGame('${sanitizeHTML(g.gamePin)}')">End</button>
             </div>
         </div>
     `).join('');
@@ -156,7 +161,7 @@ window.viewPlayers = gamePin => {
         toast('Game not found', 'error'); 
         return; 
     }
-    let html = `<h3 style="margin-top:0">Players - Game ${gamePin}</h3>`;
+    let html = `<h3 style="margin-top:0">Players - Game ${sanitizeHTML(gamePin)}</h3>`;
     if (g.playerCount === 0) {
         html += '<p>No players joined this game.</p>';
     } else {
@@ -168,9 +173,9 @@ window.viewPlayers = gamePin => {
             </tr>` +
             g.players.map(p => `
                 <tr>
-                    <td>${p.name || '?'}</td>
+                    <td>${sanitizeHTML(p.name) || '?'}</td>
                     <td style="text-align:center; font-weight:bold;">${p.score || 0}</td>
-                    <td>${p.status || 'waiting'}</td>
+                    <td>${sanitizeHTML(p.status) || 'waiting'}</td>
                 </tr>
             `).join('') +
             '</table>';

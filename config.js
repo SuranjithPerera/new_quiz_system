@@ -121,7 +121,7 @@ class SessionManager {
 
     initializeSession() {
         try {
-            const savedSession = localStorage.getItem(this.sessionKey);
+            const savedSession = sessionStorage.getItem(this.sessionKey);
             if (savedSession) {
                 sessionData = JSON.parse(savedSession);
             } else {
@@ -137,7 +137,7 @@ class SessionManager {
 
     handleRecovery() {
         try {
-            const recoveryData = localStorage.getItem(this.recoveryKey);
+            const recoveryData = sessionStorage.getItem(this.recoveryKey);
             if (recoveryData) {
                 const recovery = JSON.parse(recoveryData);
                 const timeSinceLastSave = Date.now() - recovery.timestamp;
@@ -151,7 +151,7 @@ class SessionManager {
                 }
                 
                 if (timeSinceLastSave > 10 * 60 * 1000) { 
-                    localStorage.removeItem(this.recoveryKey);
+                    sessionStorage.removeItem(this.recoveryKey);
                 }
             }
         } catch (error) {
@@ -164,13 +164,13 @@ class SessionManager {
                 timestamp: Date.now(),
                 sessionData: { ...sessionData, lastUpdated: Date.now() }
             };
-            localStorage.setItem(this.recoveryKey, JSON.stringify(recoveryData));
+            sessionStorage.setItem(this.recoveryKey, JSON.stringify(recoveryData));
         } catch (error) {
         }
     }
 
     createNewSession() {
-        localStorage.removeItem('savedQuizzes');
+        sessionStorage.removeItem('savedQuizzes');
         
         sessionData = {
             quizzes: [],
@@ -188,7 +188,7 @@ class SessionManager {
     saveSession() {
         try {
             sessionData.lastUpdated = Date.now();
-            localStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
+            sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
             
             if (!this.lastRecoveryCheckpoint || 
                 Date.now() - this.lastRecoveryCheckpoint > 30000) {
@@ -337,9 +337,9 @@ class SessionManager {
     }
 
     clearSession() {
-        localStorage.removeItem(this.sessionKey);
-        localStorage.removeItem(this.recoveryKey);
-        localStorage.removeItem('savedQuizzes');
+        sessionStorage.removeItem(this.sessionKey);
+        sessionStorage.removeItem(this.recoveryKey);
+        sessionStorage.removeItem('savedQuizzes');
         this.createNewSession();
     }
 }
@@ -356,14 +356,14 @@ async function setupAuthStateListener() {
                 currentUser = user;
                 
                 if (user) {
-                    const storedUserId = localStorage.getItem('userId');
+                    const storedUserId = sessionStorage.getItem('userId');
                     if (storedUserId && storedUserId !== user.uid) {
                         sessionManager.clearSession();
                     }
 
-                    localStorage.setItem('userEmail', user.email);
-                    localStorage.setItem('userName', user.displayName || user.email);
-                    localStorage.setItem('userId', user.uid);
+                    sessionStorage.setItem('userEmail', user.email);
+                    sessionStorage.setItem('userName', user.displayName || user.email);
+                    sessionStorage.setItem('userId', user.uid);
                     
                     const loadResult = await sessionManager.loadUserDataFromFirebase(user);
                     if (loadResult.success) {
@@ -373,9 +373,9 @@ async function setupAuthStateListener() {
                     }
                     
                 } else {
-                    localStorage.removeItem('userEmail');
-                    localStorage.removeItem('userName');
-                    localStorage.removeItem('userId');
+                    sessionStorage.removeItem('userEmail');
+                    sessionStorage.removeItem('userName');
+                    sessionStorage.removeItem('userId');
                     
                     sessionManager.clearSession();
                     

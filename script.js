@@ -1,3 +1,8 @@
+const sanitizeHTML = str => {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
+};
+
 const sampleQuizzes = [
     {
         id: 'sample1',
@@ -166,8 +171,9 @@ class QuizGame {
             const db = await this.waitForDatabase();
             if (!db) throw new Error('Database not available');
             
+            const safePlayerName = sanitizeHTML(playerName);
             const storageKey = 'quizmaster_playerId_' + this.gamePin;
-            let playerId = localStorage.getItem(storageKey);
+            let playerId = sessionStorage.getItem(storageKey);
             let playerExists = false;
 
             if (playerId) {
@@ -181,14 +187,14 @@ class QuizGame {
                 playerId = this.generatePlayerId();
             }
 
-            localStorage.setItem(storageKey, playerId);
+            sessionStorage.setItem(storageKey, playerId);
 
             const playerRef = db.ref(`games/${this.gamePin}/players/${playerId}`);
 
             if (!playerExists) {
                 const playerData = {
                     id: playerId,
-                    name: playerName,
+                    name: safePlayerName,
                     score: 0,
                     status: 'waiting',
                     joinedAt: Date.now(),
@@ -201,7 +207,7 @@ class QuizGame {
                 };
                 await playerRef.set(playerData);
             } else {
-                await playerRef.update({ name: playerName });
+                await playerRef.update({ name: safePlayerName });
             }
             
             return playerId;
