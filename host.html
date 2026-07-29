@@ -313,33 +313,15 @@
         }
 
         @keyframes correctReveal {
-            0% { 
-                transform: scale(1);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
-            50% { 
-                transform: scale(1.1);
-                box-shadow: 0 15px 35px rgba(76, 175, 80, 0.5);
-            }
-            100% { 
-                transform: scale(1.05);
-                box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
-            }
+            0% { transform: scale(1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+            50% { transform: scale(1.1); box-shadow: 0 15px 35px rgba(76, 175, 80, 0.5); }
+            100% { transform: scale(1.05); box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4); }
         }
 
         @keyframes bounceIn {
-            0% { 
-                transform: scale(0.3); 
-                opacity: 0; 
-            }
-            50% { 
-                transform: scale(1.1); 
-                opacity: 1; 
-            }
-            100% { 
-                transform: scale(1); 
-                opacity: 1; 
-            }
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .host-timer {
@@ -380,23 +362,148 @@
         }
 
         @keyframes urgentPulse {
-            0%, 100% { 
-                opacity: 1; 
-                transform: scale(1);
-            }
-            50% { 
-                opacity: 0.8; 
-                transform: scale(1.05);
-            }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
         }
 
         @keyframes pinGlow {
-            0% { 
-                box-shadow: 0 20px 60px rgba(70, 23, 143, 0.4);
-            }
-            100% { 
-                box-shadow: 0 25px 70px rgba(70, 23, 143, 0.6), 0 0 40px rgba(156, 77, 255, 0.3);
-            }
+            0% { box-shadow: 0 20px 60px rgba(70, 23, 143, 0.4); }
+            100% { box-shadow: 0 25px 70px rgba(70, 23, 143, 0.6), 0 0 40px rgba(156, 77, 255, 0.3); }
+        }
+
+        /* =========================================
+           PODIUM STYLES (KAHOOT STYLE)
+           ========================================= */
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 15px;
+            margin: 40px auto 30px;
+            min-height: 300px;
+            padding: 0 10px;
+            width: 100%;
+        }
+
+        .podium-spot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+            max-width: 160px;
+            opacity: 0;
+            animation: riseUp 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .podium-spot.rank-1 { animation-delay: 0.6s; z-index: 3;}
+        .podium-spot.rank-2 { animation-delay: 0.3s; z-index: 2;}
+        .podium-spot.rank-3 { animation-delay: 0s; z-index: 1;}
+
+        .podium-bar {
+            width: 100%;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 15px;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.3) inset, 0 10px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rank-1 .podium-bar {
+            height: 200px;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+        }
+
+        .rank-2 .podium-bar {
+            height: 140px;
+            background: linear-gradient(135deg, #e0e0e0 0%, #9e9e9e 100%);
+        }
+
+        .rank-3 .podium-bar {
+            height: 100px;
+            background: linear-gradient(135deg, #cd7f32 0%, #8b4513 100%);
+        }
+
+        .rank-number {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.6);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .avatar-container {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .dummy-gif {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            padding: 5px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            animation: winnerBounce 1s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5);
+            object-fit: cover;
+        }
+
+        .rank-1 .dummy-gif {
+            width: 120px;
+            height: 120px;
+            animation: winnerBounce 0.6s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5), glow 2s infinite alternate;
+            border: 5px solid #ffd700;
+            background: white;
+        }
+
+        .rank-2 .dummy-gif { border: 4px solid #e0e0e0; }
+        .rank-3 .dummy-gif { border: 4px solid #cd7f32; }
+
+        .podium-name {
+            font-weight: 900;
+            font-size: clamp(0.9rem, 3vw, 1.3rem);
+            color: white;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+            margin-bottom: 5px;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .podium-score {
+            font-weight: 700;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            color: #ffffff;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .other-players-list {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes riseUp {
+            0% { opacity: 0; transform: translateY(150px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes winnerBounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-30px); }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 15px #ffd700; }
+            100% { box-shadow: 0 0 40px #ffd700, 0 0 15px #ff8c00 inset; }
         }
 
         @media (max-width: 768px) {
@@ -406,6 +513,19 @@
                 padding: 5px;
                 margin-top: 5px;
             }
+            
+            .podium-container {
+                gap: 8px;
+                min-height: 250px;
+                margin: 20px auto;
+            }
+            
+            .rank-1 .podium-bar { height: 150px; }
+            .rank-2 .podium-bar { height: 110px; }
+            .rank-3 .podium-bar { height: 80px; }
+            
+            .rank-1 .dummy-gif { width: 90px; height: 90px; }
+            .dummy-gif { width: 65px; height: 65px; border-width: 3px;}
         }
     </style>
 </head>
@@ -495,8 +615,8 @@
         <div id="results-screen" class="quiz-container" style="display: none;">
             <div class="question-card">
                 <h2>🏆 Final Results</h2>
-                <div class="leaderboard" id="final-leaderboard"></div>
-                <div class="game-controls">
+                <div id="final-leaderboard"></div>
+                <div class="game-controls" style="margin-top: 40px; border-top: 2px solid rgba(255,255,255,0.2); padding-top: 25px;">
                     <button onclick="resetGame()" class="btn btn-primary">Host New Game</button>
                     <button onclick="location.href='index.html'" class="btn btn-secondary">Back to Home</button>
                 </div>
@@ -565,16 +685,12 @@
 
         async function loadAvailableQuizzes() {
             const quizList = document.getElementById('quiz-list');
-            
-            if (!quizList) {
-                return;
-            }
+            if (!quizList) return;
             
             quizList.innerHTML = '<div style="text-align: center; padding: 20px; color: white;">Loading quizzes...</div>';
             
             try {
                 const savedQuizzes = await loadUserQuizzes();
-                
                 quizList.innerHTML = '';
                 
                 let hasValidQuizzes = false;
@@ -608,7 +724,6 @@
                         </div>
                     `;
                 }
-                
             } catch (error) {
                 quizList.innerHTML = `
                     <div class="menu-card">
@@ -645,51 +760,36 @@
         async function loadUserQuizzes() {
             try {
                 if (typeof loadAllQuizzes === 'function') {
-                    const quizzes = await loadAllQuizzes();
-                    return quizzes;
-                } else {
-                    return [];
+                    return await loadAllQuizzes();
                 }
-            } catch (error) {
                 return [];
-            }
+            } catch (error) { return []; }
         }
 
         async function selectQuiz(quizId, type) {
             showStatus('Loading quiz...', 'info');
-            
             try {
                 let selectedQuiz = null;
-                
                 if (type === 'sample') {
                     selectedQuiz = sampleQuizzes.find(q => q.id === quizId);
                 } else {
                     const allQuizzes = await loadUserQuizzes();
                     selectedQuiz = allQuizzes.find(q => q.id === quizId);
                 }
-                
-                if (!selectedQuiz) {
-                    throw new Error('Quiz not found');
-                }
+                if (!selectedQuiz) throw new Error('Quiz not found');
                 
                 const validatedQuiz = await validateAndRepairQuiz(selectedQuiz);
-                
-                if (!validatedQuiz) {
-                    throw new Error('Quiz validation failed');
-                }
+                if (!validatedQuiz) throw new Error('Quiz validation failed');
                 
                 hostCurrentQuiz = validatedQuiz;
                 createGameSession();
-                
             } catch (error) {
                 showStatus('Error loading quiz: ' + error.message, 'error');
             }
         }
 
         async function validateAndRepairQuiz(quiz) {
-            if (!quiz || typeof quiz !== 'object') {
-                return null;
-            }
+            if (!quiz || typeof quiz !== 'object') return null;
             
             const repairedQuiz = {
                 id: quiz.id || 'quiz_' + Date.now(),
@@ -699,51 +799,27 @@
                 updatedAt: quiz.updatedAt || Date.now()
             };
             
-            if (!quiz.questions || !Array.isArray(quiz.questions)) {
-                return null;
-            }
+            if (!quiz.questions || !Array.isArray(quiz.questions)) return null;
             
             for (let i = 0; i < quiz.questions.length; i++) {
                 const question = quiz.questions[i];
                 const repairedQuestion = validateAndRepairQuestion(question, i + 1);
-                
-                if (repairedQuestion) {
-                    repairedQuiz.questions.push(repairedQuestion);
-                }
+                if (repairedQuestion) repairedQuiz.questions.push(repairedQuestion);
             }
-            
-            if (repairedQuiz.questions.length === 0) {
-                return null;
-            }
-            
+            if (repairedQuiz.questions.length === 0) return null;
             return repairedQuiz;
         }
 
         function validateAndRepairQuestion(question, questionNumber) {
-            if (!question || typeof question !== 'object') {
-                return null;
-            }
+            if (!question || typeof question !== 'object') return null;
+            if (!question.question || typeof question.question !== 'string' || question.question.trim() === '') return null;
+            if (!question.answers || !Array.isArray(question.answers) || question.answers.length < 2) return null;
             
-            if (!question.question || typeof question.question !== 'string' || question.question.trim() === '') {
-                return null;
-            }
-            
-            if (!question.answers || !Array.isArray(question.answers) || question.answers.length < 2) {
-                return null;
-            }
-            
-            const validAnswers = question.answers.filter(answer => 
-                answer && typeof answer === 'string' && answer.trim() !== ''
-            );
-            
-            if (validAnswers.length < 2) {
-                return null;
-            }
+            const validAnswers = question.answers.filter(answer => answer && typeof answer === 'string' && answer.trim() !== '');
+            if (validAnswers.length < 2) return null;
             
             const correctIndex = typeof question.correct === 'number' ? question.correct : 0;
-            if (correctIndex < 0 || correctIndex >= validAnswers.length) {
-                return null;
-            }
+            if (correctIndex < 0 || correctIndex >= validAnswers.length) return null;
             
             return {
                 question: question.question.trim(),
@@ -756,24 +832,18 @@
 
         async function createGameSession() {
             showStatus('Creating game session...', 'info');
-            
             try {
                 hostGamePin = generateGamePin();
-                
                 hostGameInstance = new QuizGame(hostGamePin, true);
                 
                 const gameCreated = await hostGameInstance.createGame(hostCurrentQuiz);
-                
-                if (!gameCreated) {
-                    throw new Error('Failed to create game in database');
-                }
+                if (!gameCreated) throw new Error('Failed to create game in database');
                 
                 hostGameInstance.listenToPlayers(onPlayersUpdate);
                 hostGameInstance.listenToGameState(onGameStateUpdate);
                 
                 showGameLobby();
                 showStatus('Game created! Share PIN: ' + hostGamePin, 'success');
-                
             } catch (error) {
                 showStatus('Failed to create game: ' + error.message, 'error');
             }
@@ -781,12 +851,9 @@
 
         function showGameLobby() {
             document.getElementById('game-pin').textContent = hostGamePin;
-            
             hideElement('quiz-selection');
             showElement('game-lobby');
-            
             updatePlayersDisplay({});
-            
             hostCurrentGameState = 'waiting';
             isHostGameActive = false;
         }
@@ -817,14 +884,10 @@
                     `;
                 } else {
                     containerEl.innerHTML = '';
-                    
                     Object.values(players).forEach((player, index) => {
                         const playerDiv = document.createElement('div');
                         playerDiv.className = 'player-item-lobby';
                         playerDiv.textContent = player.name || `Player ${index + 1}`;
-                        playerDiv.style.display = 'block';
-                        playerDiv.style.visibility = 'visible';
-                        playerDiv.style.opacity = '1';
                         containerEl.appendChild(playerDiv);
                     });
                 }
@@ -843,7 +906,6 @@
 
         function onGameStateUpdate(gameState) {
             if (!gameState) return;
-            
             hostCurrentGameState = gameState.status;
             
             switch (gameState.status) {
@@ -864,17 +926,14 @@
                 showStatus('No players have joined yet!', 'error');
                 return;
             }
-            
             if (!hostGameInstance) {
                 showStatus('Game session not ready', 'error');
                 return;
             }
             
             showStatus('Starting game...', 'info');
-            
             try {
                 const started = await hostGameInstance.startGame();
-                
                 if (started) {
                     hostCurrentQuestionIndex = 0;
                     isHostGameActive = true;
@@ -891,15 +950,12 @@
         function showActiveGame() {
             hideElement('game-lobby');
             showElement('active-game');
-            
             displayCurrentQuestion();
             updateResponsesDisplay();
         }
 
         function displayCurrentQuestion() {
-            if (!hostCurrentQuiz || !hostCurrentQuiz.questions || hostCurrentQuestionIndex >= hostCurrentQuiz.questions.length) {
-                return;
-            }
+            if (!hostCurrentQuiz || !hostCurrentQuiz.questions || hostCurrentQuestionIndex >= hostCurrentQuiz.questions.length) return;
             
             const question = hostCurrentQuiz.questions[hostCurrentQuestionIndex];
             const totalQuestions = hostCurrentQuiz.questions.length;
@@ -927,7 +983,6 @@
             });
             
             startHostQuestionTimer(hostQuestionTimeLimit);
-            
             hideElement('next-btn');
             hideElement('results-btn');
         }
@@ -948,13 +1003,9 @@
                 const secs = timeLeft % 60;
                 timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 
-                if (timeLeft <= 5) {
-                    timerEl.className = 'host-timer urgent';
-                } else if (timeLeft <= 10) {
-                    timerEl.className = 'host-timer warning';
-                } else {
-                    timerEl.className = 'host-timer';
-                }
+                if (timeLeft <= 5) timerEl.className = 'host-timer urgent';
+                else if (timeLeft <= 10) timerEl.className = 'host-timer warning';
+                else timerEl.className = 'host-timer';
                 
                 if (timeLeft <= 0) {
                     clearInterval(hostQuestionTimer);
@@ -971,7 +1022,6 @@
 
         function onHostQuestionTimeUp() {
             hostIsQuestionTimeUp = true;
-            
             const timerEl = document.getElementById('host-timer');
             timerEl.textContent = "TIME'S UP";
             timerEl.className = 'host-timer time-up';
@@ -1003,12 +1053,9 @@
             
             setTimeout(() => {
                 showElement('next-btn');
-                
                 if (hostCurrentQuestionIndex >= hostCurrentQuiz.questions.length - 1) {
                     showElement('results-btn');
                 }
-                
-                showStatus('Time\'s up! Correct answer revealed. Click Next to continue.', 'info');
             }, 2000);
         }
 
@@ -1041,13 +1088,10 @@
                             lastQuestionCorrect: isCorrect,
                             scoredAt: Date.now()
                         });
-                        
                         hostPlayers[playerId].score = newTotalScore;
                         hostPlayers[playerId].lastQuestionScore = questionScore;
                         hostPlayers[playerId].lastQuestionCorrect = isCorrect;
-                        
-                    } catch (error) {
-                    }
+                    } catch (error) {}
                 } else {
                     try {
                         await database.ref(`games/${hostGamePin}/players/${playerId}`).update({
@@ -1055,18 +1099,13 @@
                             lastQuestionCorrect: false,
                             scoredAt: Date.now()
                         });
-                        
                         hostPlayers[playerId].lastQuestionScore = 0;
                         hostPlayers[playerId].lastQuestionCorrect = false;
-                        
-                    } catch (error) {
-                    }
+                    } catch (error) {}
                 }
             });
             
-            setTimeout(() => {
-                updateResponsesDisplay();
-            }, 1000);
+            setTimeout(() => updateResponsesDisplay(), 1000);
         }
 
         function updateResponsesDisplay() {
@@ -1074,7 +1113,6 @@
             if (!responsesContainer) return;
             
             responsesContainer.innerHTML = '';
-            
             const sortedPlayers = Object.values(hostPlayers).sort((a, b) => (b.score || 0) - (a.score || 0));
             
             sortedPlayers.forEach(player => {
@@ -1093,7 +1131,6 @@
                     if (hostIsQuestionTimeUp) {
                         const isCorrect = player.lastQuestionCorrect;
                         const questionScore = player.lastQuestionScore || 0;
-                        
                         statusClass += isCorrect ? ' correct' : ' incorrect';
                         statusText += isCorrect ? ' ✓' : ' ✗';
                         scoreInfo = `<div class="score-info">+${questionScore} pts this question</div>`;
@@ -1108,7 +1145,6 @@
                     <span class="response-status ${statusClass}">${statusText}</span>
                     ${scoreInfo}
                 `;
-                
                 responsesContainer.appendChild(responseDiv);
             });
         }
@@ -1126,7 +1162,6 @@
             
             try {
                 hostCurrentQuestionIndex++;
-                
                 const playerUpdates = {};
                 Object.keys(hostPlayers).forEach(playerId => {
                     playerUpdates[`players/${playerId}/status`] = 'waiting';
@@ -1140,51 +1175,75 @@
                 playerUpdates['gameState/questionStartTime'] = Date.now();
                 
                 await database.ref(`games/${hostGamePin}`).update(playerUpdates);
-                
                 displayCurrentQuestion();
-                
-            } catch (error) {
-                showStatus('Error moving to next question', 'error');
-            }
+            } catch (error) { showStatus('Error moving to next question', 'error'); }
         }
 
+        // =========================================
+        // KAHOOT STYLE PODIUM RENDER LOGIC
+        // =========================================
         function showResults() {
-            if (hostQuestionTimer) {
-                clearInterval(hostQuestionTimer);
-            }
-            
+            if (hostQuestionTimer) clearInterval(hostQuestionTimer);
             hideElement('active-game');
             showElement('results-screen');
-            
             displayFinalLeaderboard();
         }
 
         function displayFinalLeaderboard() {
             const leaderboard = document.getElementById('final-leaderboard');
             if (!leaderboard) return;
-            
+
             const sortedPlayers = Object.values(hostPlayers).sort((a, b) => (b.score || 0) - (a.score || 0));
-            
-            leaderboard.innerHTML = '<h3>🏆 Final Results</h3>';
-            
-            sortedPlayers.forEach((player, index) => {
-                const div = document.createElement('div');
-                div.className = `player-score rank-${index + 1 <= 3 ? index + 1 : ''}`;
-                
-                div.innerHTML = `
-                    <span>#${index + 1} ${player.name}</span>
-                    <span>${player.score || 0} points</span>
-                `;
-                
-                leaderboard.appendChild(div);
-            });
+
+            let html = '';
+
+            const top3 = sortedPlayers.slice(0, 3);
+            if (top3.length > 0) {
+                html += '<div class="podium-container">';
+                if (top3[1]) html += createPodiumSpot(top3[1], 2);
+                if (top3[0]) html += createPodiumSpot(top3[0], 1);
+                if (top3[2]) html += createPodiumSpot(top3[2], 3);
+                html += '</div>';
+            }
+
+            const others = sortedPlayers.slice(3);
+            if (others.length > 0) {
+                html += '<div class="other-players-list">';
+                others.forEach((player, index) => {
+                    html += `
+                        <div class="player-score">
+                            <span class="player-name">#${index + 4} ${player.name}</span>
+                            <span class="player-points">${player.score || 0} pts</span>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            leaderboard.innerHTML = html;
         }
 
+        function createPodiumSpot(player, rank) {
+            // Generates a cute animated SVG character using dicebear based on the student's name
+            const fallbackAvatar = `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(player.name)}`;
+
+            return `
+                <div class="podium-spot rank-${rank}">
+                    <div class="avatar-container">
+                        <img src="${fallbackAvatar}" alt="${player.name}" class="dummy-gif">
+                    </div>
+                    <div class="podium-name">${player.name}</div>
+                    <div class="podium-score">${player.score} pts</div>
+                    <div class="podium-bar">
+                        <span class="rank-number">${rank}</span>
+                    </div>
+                </div>
+            `;
+        }
+        // =========================================
+
         async function endQuiz() {
-            if (hostQuestionTimer) {
-                clearInterval(hostQuestionTimer);
-            }
-            
+            if (hostQuestionTimer) clearInterval(hostQuestionTimer);
             try {
                 if (hostGameInstance) {
                     await database.ref(`games/${hostGamePin}/gameState`).update({
@@ -1193,15 +1252,11 @@
                         endReason: 'host_ended',
                         message: 'Quiz completed by host'
                     });
-                    
                     await hostGameInstance.endGame();
                 }
-                
                 showResults();
                 showStatus('Quiz ended!', 'success');
-            } catch (error) {
-                showStatus('Error ending quiz', 'error');
-            }
+            } catch (error) { showStatus('Error ending quiz', 'error'); }
         }
 
         function resetGame() {
@@ -1209,12 +1264,10 @@
                 clearInterval(hostQuestionTimer);
                 hostQuestionTimer = null;
             }
-            
             if (hostGameInstance) {
                 hostGameInstance.cleanup();
                 hostGameInstance = null;
             }
-            
             hostCurrentQuiz = null;
             hostPlayers = {};
             hostCurrentQuestionIndex = 0;
@@ -1228,26 +1281,13 @@
             hideElement('active-game');
             hideElement('results-screen');
             showElement('quiz-selection');
-            
             showStatus('Ready to host a new game!', 'success');
-            
             loadAvailableQuizzes();
         }
 
-        function createCustomQuiz() {
-            window.location.href = 'manage.html';
-        }
-
-        function hideElement(elementId) {
-            const element = document.getElementById(elementId);
-            if (element) element.style.display = 'none';
-        }
-
-        function showElement(elementId) {
-            const element = document.getElementById(elementId);
-            if (element) element.style.display = 'block';
-        }
-
+        function createCustomQuiz() { window.location.href = 'manage.html'; }
+        function hideElement(elementId) { const element = document.getElementById(elementId); if (element) element.style.display = 'none'; }
+        function showElement(elementId) { const element = document.getElementById(elementId); if (element) element.style.display = 'block'; }
         function showStatus(message, type) {
             const statusEl = document.getElementById('status-message');
             if (statusEl) {
@@ -1259,10 +1299,7 @@
                 }, 3000);
             }
         }
-
-        function generateGamePin() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
+        function generateGamePin() { return Math.floor(100000 + Math.random() * 900000).toString(); }
 
         window.addEventListener('beforeunload', () => {
             if (hostQuestionTimer) clearInterval(hostQuestionTimer);
