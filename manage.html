@@ -568,7 +568,7 @@
         
         <div id="quiz-list-view" class="quiz-container">
             <div class="question-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <div class="section-header-flex">
                     <h2>Your Quizzes</h2>
                     <button onclick="showCreateQuiz()" class="btn btn-primary">+ Create New Quiz</button>
                 </div>
@@ -578,7 +578,7 @@
         
         <div id="quiz-editor" class="quiz-container" style="display: none;">
             <div class="question-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <div class="section-header-flex">
                     <h2 id="editor-title">Create New Quiz</h2>
                     <button onclick="cancelEdit()" class="btn btn-secondary">Cancel</button>
                 </div>
@@ -600,9 +600,9 @@
 
                         <div id="manual-tab" class="tab-content active">
                             <div class="questions-section">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                                <div class="section-header-flex">
                                     <h3>Questions</h3>
-                                    <button onclick="addQuestion()" class="btn btn-tertiary" style="width: 100% !important;">+ Add Question</button>
+                                    <button onclick="addQuestion()" class="btn btn-tertiary">+ Add Question</button>
                                 </div>
                                 <div id="questions-container"></div>
                             </div>
@@ -679,7 +679,7 @@ ANSWER: C"></textarea>
                         </div>
                     </div>
                     
-                    <div class="form-actions">
+                    <div class="form-actions section-header-flex">
                         <button onclick="saveQuiz()" class="btn btn-primary" id="save-btn">Save Quiz</button>
                         <button onclick="previewQuiz()" class="btn btn-secondary">Preview</button>
                     </div>
@@ -689,7 +689,7 @@ ANSWER: C"></textarea>
         
         <div id="quiz-preview" class="quiz-container" style="display: none;">
             <div class="question-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <div class="section-header-flex">
                     <h2>Quiz Preview</h2>
                     <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
                         <button onclick="editQuiz()" class="btn btn-tertiary">Edit</button>

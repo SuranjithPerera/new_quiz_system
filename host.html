@@ -418,9 +418,11 @@
         
         <div id="quiz-selection" class="quiz-container">
             <div class="question-card">
-                <h2>Select a Quiz to Host</h2>
+                <div class="section-header-flex">
+                    <h2>Select a Quiz to Host</h2>
+                    <button onclick="createCustomQuiz()" class="btn btn-tertiary">Create New Quiz</button>
+                </div>
                 <div id="quiz-list"></div>
-                <button onclick="createCustomQuiz()" class="btn btn-tertiary">Create New Quiz</button>
             </div>
         </div>
         
@@ -634,7 +636,7 @@
                     <p><small><strong>${typeLabel}</strong></small></p>
                     ${quiz.createdAt ? `<p><small>Created: ${new Date(quiz.createdAt).toLocaleDateString()}</small></p>` : ''}
                 </div>
-                <button onclick="selectQuiz('${quiz.id}', '${type}')" class="btn btn-primary">Select Quiz</button>
+                <button onclick="selectQuiz('${quiz.id}', '${type}')" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Select Quiz</button>
             `;
             
             container.appendChild(quizCard);
