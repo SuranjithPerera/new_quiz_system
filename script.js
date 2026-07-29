@@ -166,23 +166,44 @@ class QuizGame {
             const db = await this.waitForDatabase();
             if (!db) throw new Error('Database not available');
             
-            const playerId = this.generatePlayerId();
-            const playerData = {
-                id: playerId,
-                name: playerName,
-                score: 0,
-                status: 'waiting',
-                joinedAt: Date.now(),
-                currentAnswer: null,
-                responseTime: null,
-                questionScore: null,
-                isCorrect: null,
-                lastQuestionScore: 0,
-                lastQuestionCorrect: false
-            };
+            const storageKey = 'quizmaster_playerId_' + this.gamePin;
+            let playerId = localStorage.getItem(storageKey);
+            let playerExists = false;
+
+            if (playerId) {
+                const playerSnapshot = await db.ref(`games/${this.gamePin}/players/${playerId}`).once('value');
+                if (playerSnapshot.exists()) {
+                    playerExists = true;
+                } else {
+                    playerId = this.generatePlayerId();
+                }
+            } else {
+                playerId = this.generatePlayerId();
+            }
+
+            localStorage.setItem(storageKey, playerId);
 
             const playerRef = db.ref(`games/${this.gamePin}/players/${playerId}`);
-            await playerRef.set(playerData);
+
+            if (!playerExists) {
+                const playerData = {
+                    id: playerId,
+                    name: playerName,
+                    score: 0,
+                    status: 'waiting',
+                    joinedAt: Date.now(),
+                    currentAnswer: null,
+                    responseTime: null,
+                    questionScore: null,
+                    isCorrect: null,
+                    lastQuestionScore: 0,
+                    lastQuestionCorrect: false
+                };
+                await playerRef.set(playerData);
+            } else {
+                await playerRef.update({ name: playerName });
+            }
+            
             return playerId;
         } catch (error) {
             return null;
