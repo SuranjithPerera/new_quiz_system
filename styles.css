@@ -214,23 +214,23 @@ header p {
     padding: 15px 30px;
     border: none;
     border-radius: 50px;
-    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
     font-weight: 800;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
     text-align: center;
-    min-width: 180px;
+    min-width: 140px;
     max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-wrap: break-word;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     position: relative;
     z-index: 10;
+    line-height: 1.3;
 }
 
 .btn-primary {
@@ -918,9 +918,15 @@ header p {
     }
 }
 
-/* ========================================
-   MOBILE SPECIFIC STYLES (320px - 768px)
-   ======================================== */
+.section-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 15px 10px;
@@ -996,13 +1002,13 @@ header p {
     }
     
     .btn {
-        min-width: 0 !important;
+        min-width: 100% !important;
         width: 100% !important;
-        white-space: normal !important;
         height: auto !important;
-        padding: 15px 20px !important;
+        padding: 12px 15px !important;
         margin: 8px 0 !important;
-        font-size: 1rem !important;
+        font-size: 0.95rem !important;
+        display: block !important;
     }
     
     .player-response {
@@ -1026,6 +1032,15 @@ header p {
     }
 
     .input-group input {
+        width: 100% !important;
+    }
+    
+    .section-header-flex {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    
+    .section-header-flex button {
         width: 100% !important;
     }
 }
