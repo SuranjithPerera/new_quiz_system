@@ -6,8 +6,9 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    /* Ocean Gradient */
-    background: linear-gradient(135deg, #1368ce 0%, #26d0ce 100%);
+    /* Cyberpunk Gradient */
+    background-color: #4158D0;
+    background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
     min-height: 100vh;
     color: white;
     overflow-x: hidden;
@@ -19,7 +20,7 @@ body {
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
-}
+
 
 .container {
     max-width: 1200px;
