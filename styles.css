@@ -918,6 +918,9 @@ header p {
     }
 }
 
+/* ========================================
+   MOBILE SPECIFIC STYLES (320px - 768px)
+   ======================================== */
 @media (max-width: 768px) {
     .container {
         padding: 15px 10px;
@@ -925,13 +928,22 @@ header p {
     
     .user-header {
         position: relative !important;
-        top: 0;
-        right: 0;
-        margin: 0 auto 20px auto;
-        justify-content: center;
-        width: 100%;
-        max-width: 100%;
-        border-radius: 15px;
+        top: 0 !important;
+        right: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        margin: 10px auto 20px auto !important;
+        justify-content: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 15px !important;
+        flex-wrap: wrap !important;
+        z-index: 10 !important;
+    }
+
+    .user-header .user-info {
+        text-align: center !important;
+        width: 100% !important;
     }
     
     .main-menu {
@@ -983,9 +995,14 @@ header p {
         gap: 10px;
     }
     
-    .game-controls .btn {
-        min-width: 200px;
-        width: 100%;
+    .btn {
+        min-width: 0 !important;
+        width: 100% !important;
+        white-space: normal !important;
+        height: auto !important;
+        padding: 15px 20px !important;
+        margin: 8px 0 !important;
+        font-size: 1rem !important;
     }
     
     .player-response {
@@ -1000,7 +1017,16 @@ header p {
     }
     
     .user-name, .user-email {
-        max-width: 150px;
+        max-width: 100% !important;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-group input {
+        width: 100% !important;
     }
 }
 

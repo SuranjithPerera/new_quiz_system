@@ -141,9 +141,9 @@
                 authSection.innerHTML = `
                     <div class="user-info" style="text-align: center;">
                         <p>Welcome, <strong>${user.displayName || user.email}</strong>!</p>
-                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="window.location.href='manage.html'" style="flex: 1; min-width: 120px;">My Quizzes</button>
-                            <button class="btn btn-secondary" onclick="signOut()" style="flex: 1; min-width: 120px;">Sign Out</button>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-direction: column; width: 100%;">
+                            <button class="btn btn-primary" onclick="window.location.href='manage.html'">My Quizzes</button>
+                            <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
                         </div>
                     </div>
                 `;
