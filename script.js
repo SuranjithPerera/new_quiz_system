@@ -1,4 +1,4 @@
-// Attach directly to window to avoid 'const' redeclaration crashes
+// Global Utility & Security Functions
 window.sanitizeHTML = function(str) {
     if (str === null || str === undefined) return '';
     return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
@@ -61,6 +61,7 @@ window.sampleQuizzes = [
     }
 ];
 
+// Core Game Classes
 class ScoringSystem {
     constructor() {
         this.baseScore = 1000;
@@ -70,16 +71,14 @@ class ScoringSystem {
 
     calculateScore(isCorrect, responseTime, questionTimeLimit, questionDifficulty = 1) {
         if (!isCorrect) return 0;
-        
         let score = this.baseScore * questionDifficulty;
         const timePercentage = Math.max(0, (questionTimeLimit - responseTime) / questionTimeLimit);
         const speedBonus = Math.floor(this.baseScore * this.speedBonusMultiplier * timePercentage);
         const correctBonus = this.correctAnswerBonus * questionDifficulty;
-        
         return Math.max(0, Math.floor(score + speedBonus + correctBonus));
     }
 }
-window.ScoringSystem = ScoringSystem; // Make globally available instantly
+window.ScoringSystem = ScoringSystem;
 
 class PlayerAnswerManager {
     constructor() {
@@ -125,7 +124,6 @@ class QuizGame {
 
     async createGame(quiz) {
         if (!this.isHost) return false;
-        
         try {
             const db = await this.waitForDatabase();
             if (!db) throw new Error('Database not available');
@@ -203,7 +201,6 @@ class QuizGame {
 
     async startGame() {
         if (!this.isHost) return false;
-        
         try {
             const db = await this.waitForDatabase();
             if (!db) throw new Error('Database not available');
@@ -224,11 +221,9 @@ class QuizGame {
 
     async nextQuestion() {
         if (!this.isHost) return false;
-        
         try {
             const nextQuestionIndex = this.currentQuestion + 1;
             const startTime = Date.now();
-            
             const db = await this.waitForDatabase();
             if (!db) throw new Error('Database not available');
             
@@ -248,7 +243,6 @@ class QuizGame {
             });
             
             await db.ref(`games/${this.gamePin}`).update(updates);
-            
             this.currentQuestion = nextQuestionIndex;
             this.questionStartTime = startTime;
             return true;
@@ -259,7 +253,6 @@ class QuizGame {
 
     async endGame() {
         if (!this.isHost) return false;
-        
         try {
             const db = await this.waitForDatabase();
             if (!db) throw new Error('Database not available');
@@ -268,7 +261,6 @@ class QuizGame {
                 status: 'finished',
                 endedAt: Date.now()
             });
-            
             return true;
         } catch (error) {
             return false;
@@ -289,7 +281,6 @@ class QuizGame {
             
             if (playerData) {
                 const newTotalScore = (playerData.score || 0) + score;
-                
                 await playerRef.update({
                     score: newTotalScore,
                     lastQuestionScore: score,
@@ -298,11 +289,9 @@ class QuizGame {
                     isCorrect: isCorrect,
                     scoredAt: Date.now()
                 });
-                
                 return { score, totalScore: newTotalScore, isCorrect };
             }
-        } catch (error) {
-        }
+        } catch (error) {}
         
         return { score: 0, totalScore: 0, isCorrect: false };
     }
@@ -311,7 +300,6 @@ class QuizGame {
         return new Promise((resolve) => {
             let attempts = 0;
             const maxAttempts = 20;
-            
             const checkDatabase = () => {
                 attempts++;
                 if (window.database && typeof window.database.ref === 'function') {
@@ -322,7 +310,6 @@ class QuizGame {
                     setTimeout(checkDatabase, 200);
                 }
             };
-            
             checkDatabase();
         });
     }
@@ -359,21 +346,318 @@ class QuizGame {
                 db.ref(`games/${this.gamePin}/gameState`).off();
             }
         });
-        
         if (this.timer) {
             clearInterval(this.timer);
             this.timer = null;
         }
     }
 }
-window.QuizGame = QuizGame; // Force instant global availability
+window.QuizGame = QuizGame;
+
+// Firebase Configuration & Initialization
+const firebaseConfig = {
+    apiKey: "AIzaSyB2sHk8KwuoJlIBK0ceZxS2IvKgquid04A",
+    authDomain: "quizsystem-fbdb9.firebaseapp.com",
+    databaseURL: "https://quizsystem-fbdb9-default-rtdb.firebaseio.com",
+    projectId: "quizsystem-fbdb9",
+    storageBucket: "quizsystem-fbdb9.firebasestorage.app",
+    messagingSenderId: "637015291465",
+    appId: "1:637015291465:web:893fea9aea38abda6df198",
+    measurementId: "G-QGJM9L11N9"
+};
+
+let database = null;
+let auth = null;
+let isFirebaseInitialized = false;
+let initializationPromise = null;
+
+function initializeFirebaseIfNeeded() {
+    if (initializationPromise) return initializationPromise;
+    
+    initializationPromise = new Promise(async (resolve, reject) => {
+        try {
+            if (typeof firebase === 'undefined') throw new Error('Firebase SDK not loaded');
+            let app;
+            try { app = firebase.app(); } catch (error) { app = firebase.initializeApp(firebaseConfig); }
+            
+            auth = firebase.auth();
+            database = firebase.database();
+            
+            window.auth = auth;
+            window.database = database;
+            
+            isFirebaseInitialized = true;
+            resolve({ auth, database });
+        } catch (error) {
+            createMockServices();
+            reject(error);
+        }
+    });
+    return initializationPromise;
+}
+
+function createMockServices() {
+    const mockAuth = {
+        onAuthStateChanged: function(callback) { setTimeout(() => callback(null), 100); return () => {}; },
+        signOut: function() { return Promise.resolve(); },
+        currentUser: null
+    };
+    const mockDatabase = {
+        ref: function(path) {
+            return {
+                set: function() { return Promise.reject(new Error('Firebase not available')); },
+                update: function() { return Promise.reject(new Error('Firebase not available')); },
+                once: function(event, callback, errorCallback) {
+                    if (errorCallback) setTimeout(() => errorCallback(new Error('Firebase not available')), 100);
+                    return Promise.reject(new Error('Firebase not available'));
+                },
+                on: function(event, callback, errorCallback) {
+                    if (errorCallback) setTimeout(() => errorCallback(new Error('Firebase not available')), 100);
+                },
+                off: function() {}
+            };
+        }
+    };
+    auth = mockAuth;
+    database = mockDatabase;
+    window.auth = mockAuth;
+    window.database = mockDatabase;
+}
+
+// Session Management
+let currentUser = null;
+let sessionData = { quizzes: [], stats: {}, userData: {} };
+
+class SessionManager {
+    constructor() {
+        this.sessionKey = 'quizmaster_session';
+        this.tempDataKey = 'quizmaster_temp_data';
+        this.recoveryKey = 'quizmaster_recovery';
+        this.isInitialized = false;
+    }
+
+    initializeSession() {
+        try {
+            const savedSession = sessionStorage.getItem(this.sessionKey);
+            if (savedSession) {
+                sessionData = JSON.parse(savedSession);
+            } else {
+                this.createNewSession();
+            }
+            this.isInitialized = true;
+            this.handleRecovery();
+        } catch (error) {
+            this.createNewSession();
+        }
+    }
+
+    handleRecovery() {
+        try {
+            const recoveryData = sessionStorage.getItem(this.recoveryKey);
+            if (recoveryData) {
+                const recovery = JSON.parse(recoveryData);
+                const timeSinceLastSave = Date.now() - recovery.timestamp;
+                if (timeSinceLastSave < 5 * 60 * 1000) {
+                    if (recovery.sessionData && (!sessionData.lastUpdated || recovery.sessionData.lastUpdated > sessionData.lastUpdated)) {
+                        sessionData = { ...sessionData, ...recovery.sessionData };
+                        this.saveSession();
+                    }
+                }
+                if (timeSinceLastSave > 10 * 60 * 1000) { 
+                    sessionStorage.removeItem(this.recoveryKey);
+                }
+            }
+        } catch (error) {}
+    }
+
+    saveRecoveryCheckpoint() {
+        try {
+            const recoveryData = { timestamp: Date.now(), sessionData: { ...sessionData, lastUpdated: Date.now() } };
+            sessionStorage.setItem(this.recoveryKey, JSON.stringify(recoveryData));
+        } catch (error) {}
+    }
+
+    createNewSession() {
+        sessionStorage.removeItem('savedQuizzes');
+        sessionData = {
+            quizzes: [],
+            stats: { quizCount: 0, totalPlays: 0 },
+            userData: {},
+            sessionId: 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            createdAt: Date.now(),
+            lastUpdated: Date.now(),
+            isGuest: true,
+            userId: null
+        };
+        this.saveSession();
+    }
+
+    saveSession() {
+        try {
+            sessionData.lastUpdated = Date.now();
+            sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
+            if (!this.lastRecoveryCheckpoint || Date.now() - this.lastRecoveryCheckpoint > 30000) {
+                this.saveRecoveryCheckpoint();
+                this.lastRecoveryCheckpoint = Date.now();
+            }
+        } catch (error) {}
+    }
+
+    getSessionQuizzes() {
+        return sessionData.quizzes || [];
+    }
+
+    addQuizToSession(quiz) {
+        if (!sessionData.quizzes) sessionData.quizzes = [];
+        if (!sessionData.stats) sessionData.stats = { quizCount: 0, totalPlays: 0 };
+        
+        const existingIndex = sessionData.quizzes.findIndex(q => q.id === quiz.id);
+        if (existingIndex !== -1) {
+            sessionData.quizzes[existingIndex] = quiz;
+        } else {
+            sessionData.quizzes.push(quiz);
+            sessionData.stats.quizCount = (sessionData.stats.quizCount || 0) + 1;
+        }
+        
+        this.saveSession();
+        
+        const activeUser = (typeof auth !== 'undefined' && auth && auth.currentUser) ? auth.currentUser : currentUser;
+        if (activeUser && !sessionData.isGuest && database && database.ref) {
+            this.saveQuizToFirebase(activeUser.uid, quiz).catch(console.error);
+        }
+    }
+
+    async saveQuizToFirebase(userId, quiz, retryCount = 0) {
+        try {
+            if (!database || !database.ref) throw new Error('Firebase not available');
+            await database.ref(`users/${userId}/quizzes/${quiz.id}`).set({
+                ...quiz,
+                userId: userId,
+                updatedAt: Date.now(),
+                syncedAt: Date.now()
+            });
+        } catch (error) {
+            if (retryCount < 1) {
+                setTimeout(() => this.saveQuizToFirebase(userId, quiz, retryCount + 1), 3000);
+            }
+            throw error;
+        }
+    }
+
+    async loadUserDataFromFirebase(user) {
+        try {
+            if (!database || !database.ref) throw new Error('Firebase not available');
+            const userData = await this.getFirebaseUserData(user.uid);
+            const quizzes = await this.getFirebaseQuizzes(user.uid);
+            const localQuizzes = sessionData.quizzes || [];
+            
+            let finalQuizzes;
+            if (sessionData.isGuest || !sessionData.userId || sessionData.userId === user.uid) {
+                finalQuizzes = this.mergeQuizzes(localQuizzes, quizzes);
+            } else {
+                finalQuizzes = quizzes;
+            }
+
+            sessionData.quizzes = finalQuizzes;
+            sessionData.stats = userData.stats || sessionData.stats || { quizCount: 0, totalPlays: 0 };
+            sessionData.userData = userData;
+            sessionData.isGuest = false;
+            sessionData.userId = user.uid;
+            sessionData.userEmail = user.email;
+
+            this.saveSession();
+            return { success: true, quizzes: finalQuizzes, userData };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    mergeQuizzes(localQuizzes, remoteQuizzes) {
+        const merged = [];
+        const processedIds = new Set();
+        remoteQuizzes.forEach(remoteQuiz => { merged.push(remoteQuiz); processedIds.add(remoteQuiz.id); });
+        localQuizzes.forEach(localQuiz => {
+            if (!processedIds.has(localQuiz.id)) { merged.push(localQuiz); processedIds.add(localQuiz.id); }
+        });
+        return merged;
+    }
+
+    async getFirebaseUserData(userId) {
+        try {
+            const snapshot = await database.ref(`users/${userId}`).once('value');
+            return snapshot.val() || {};
+        } catch (error) { return {}; }
+    }
+
+    async getFirebaseQuizzes(userId) {
+        try {
+            const snapshot = await database.ref(`users/${userId}/quizzes`).once('value');
+            const quizzes = snapshot.val() || {};
+            return Object.values(quizzes);
+        } catch (error) { return []; }
+    }
+
+    clearSession() {
+        sessionStorage.removeItem(this.sessionKey);
+        sessionStorage.removeItem(this.recoveryKey);
+        sessionStorage.removeItem('savedQuizzes');
+        this.createNewSession();
+    }
+}
+
+window.sessionManager = new SessionManager();
+
+// App Logic & UI Functions
+async function setupAuthStateListener() {
+    try {
+        await waitForAuth();
+        if (auth && typeof auth.onAuthStateChanged === 'function') {
+            auth.onAuthStateChanged(async (user) => {
+                currentUser = user;
+                if (user) {
+                    const storedUserId = sessionStorage.getItem('userId');
+                    if (storedUserId && storedUserId !== user.uid) window.sessionManager.clearSession();
+                    sessionStorage.setItem('userEmail', user.email);
+                    sessionStorage.setItem('userName', user.displayName || user.email);
+                    sessionStorage.setItem('userId', user.uid);
+                    
+                    const loadResult = await window.sessionManager.loadUserDataFromFirebase(user);
+                    if (loadResult.success) {
+                        window.dispatchEvent(new CustomEvent('userDataUpdated', { 
+                            detail: { quizzes: loadResult.quizzes, userData: loadResult.userData }
+                        }));
+                    }
+                } else {
+                    sessionStorage.removeItem('userEmail');
+                    sessionStorage.removeItem('userName');
+                    sessionStorage.removeItem('userId');
+                    window.sessionManager.clearSession();
+                    window.dispatchEvent(new CustomEvent('userDataUpdated', { detail: { quizzes: [], userData: {} } }));
+                }
+            });
+        }
+    } catch (error) {}
+}
+
+function waitForAuth() {
+    return new Promise((resolve) => {
+        let attempts = 0;
+        const checkAuth = () => {
+            attempts++;
+            if (window.auth && typeof window.auth.onAuthStateChanged === 'function') resolve();
+            else if (attempts >= 20) resolve(); 
+            else setTimeout(checkAuth, 100);
+        };
+        checkAuth();
+    });
+}
 
 window.generateGamePin = function() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
 window.generatePlayerId = function() {
-    return Date.now().toString() + '_' + Math.floor(Math.random() * 1000).toString();
+    return Date.now().toString() + Math.floor(Math.random() * 1000).toString();
 };
 
 window.calculateScore = function(isCorrect, responseTime, maxTime) {
@@ -392,3 +676,78 @@ window.hideElement = function(elementId) {
     const element = document.getElementById(elementId);
     if (element) element.style.display = 'none';
 };
+
+window.showStatus = function(message, type = 'info') {
+    const statusEl = document.getElementById('status-message') || document.getElementById('status');
+    if (statusEl) {
+        statusEl.textContent = message;
+        statusEl.className = `status-message ${type}`;
+        setTimeout(() => {
+            statusEl.textContent = '';
+            statusEl.className = 'status-message';
+        }, 3000);
+    }
+};
+
+window.saveQuizToSystem = async function(quizData) {
+    window.sessionManager.addQuizToSession(quizData);
+    const activeUser = (typeof auth !== 'undefined' && auth && auth.currentUser) ? auth.currentUser : currentUser;
+    
+    if (activeUser && database && database.ref) {
+        try {
+            await window.sessionManager.saveQuizToFirebase(activeUser.uid, quizData);
+            return { success: true, location: 'firebase' };
+        } catch (error) {
+            return { success: true, location: 'local', error: error.message };
+        }
+    } else {
+        return { success: true, location: 'session' };
+    }
+};
+
+window.loadAllQuizzes = async function() {
+    const activeUser = (typeof auth !== 'undefined' && auth && auth.currentUser) ? auth.currentUser : currentUser;
+    if (activeUser && database && database.ref) {
+        const result = await window.sessionManager.loadUserDataFromFirebase(activeUser);
+        if (result.success) return result.quizzes;
+    }
+    return window.sessionManager.getSessionQuizzes();
+};
+
+window.deleteQuizFromSystem = async function(quizId) {
+    sessionData.quizzes = sessionData.quizzes.filter(q => q.id !== quizId);
+    window.sessionManager.saveSession();
+    
+    const activeUser = (typeof auth !== 'undefined' && auth && auth.currentUser) ? auth.currentUser : currentUser;
+    if (activeUser && database && database.ref) {
+        try {
+            await database.ref(`users/${activeUser.uid}/quizzes/${quizId}`).remove();
+        } catch (error) {}
+    }
+    return true;
+};
+
+window.signOut = async function() {
+    try {
+        window.sessionManager.saveRecoveryCheckpoint();
+        window.sessionManager.clearSession();
+        if (auth && typeof auth.signOut === 'function') {
+            await auth.signOut();
+        }
+    } catch (error) {}
+};
+
+// Database References Setup
+window.getGameRef = function(pin) { return (database && typeof database.ref === 'function') ? database.ref(`games/${pin}`) : null; };
+window.getPlayersRef = function(pin) { return (database && typeof database.ref === 'function') ? database.ref(`games/${pin}/players`) : null; };
+window.getGameStateRef = function(pin) { return (database && typeof database.ref === 'function') ? database.ref(`games/${pin}/gameState`) : null; };
+window.getUserQuizzesRef = function(userId) { return (database && typeof database.ref === 'function') ? database.ref(`users/${userId}/quizzes`) : null; };
+window.getUserDataRef = function(userId) { return (database && typeof database.ref === 'function') ? database.ref(`users/${userId}`) : null; };
+window.getUserStatsRef = function(userId) { return (database && typeof database.ref === 'function') ? database.ref(`users/${userId}/stats`) : null; };
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.sessionManager.initializeSession();
+    initializeFirebaseIfNeeded()
+        .then(() => setupAuthStateListener())
+        .catch(console.error);
+});
