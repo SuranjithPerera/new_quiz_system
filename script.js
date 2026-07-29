@@ -1,9 +1,10 @@
-const sanitizeHTML = str => {
+// Attach directly to window to avoid 'const' redeclaration crashes
+window.sanitizeHTML = function(str) {
     if (str === null || str === undefined) return '';
     return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
 };
 
-const sampleQuizzes = [
+window.sampleQuizzes = [
     {
         id: 'sample1',
         title: 'General Knowledge Quiz',
@@ -68,22 +69,17 @@ class ScoringSystem {
     }
 
     calculateScore(isCorrect, responseTime, questionTimeLimit, questionDifficulty = 1) {
-        if (!isCorrect) {
-            return 0;
-        }
-
-        let score = this.baseScore * questionDifficulty;
+        if (!isCorrect) return 0;
         
+        let score = this.baseScore * questionDifficulty;
         const timePercentage = Math.max(0, (questionTimeLimit - responseTime) / questionTimeLimit);
         const speedBonus = Math.floor(this.baseScore * this.speedBonusMultiplier * timePercentage);
-        
         const correctBonus = this.correctAnswerBonus * questionDifficulty;
         
-        const totalScore = score + speedBonus + correctBonus;
-
-        return Math.max(0, Math.floor(totalScore));
+        return Math.max(0, Math.floor(score + speedBonus + correctBonus));
     }
 }
+window.ScoringSystem = ScoringSystem; // Make globally available instantly
 
 class PlayerAnswerManager {
     constructor() {
@@ -99,11 +95,8 @@ class PlayerAnswerManager {
     }
 
     getResponseTime() {
-        if (!this.questionStartTime) {
-            return 0;
-        }
-        const responseTime = (Date.now() - this.questionStartTime) / 1000;
-        return responseTime;
+        if (!this.questionStartTime) return 0;
+        return (Date.now() - this.questionStartTime) / 1000;
     }
 
     markAnswered() {
@@ -114,12 +107,8 @@ class PlayerAnswerManager {
     canAnswer() {
         return !this.hasAnswered;
     }
-
-    getSubmissionDelay() {
-        if (!this.answerSubmittedTime || !this.questionStartTime) return 0;
-        return (this.answerSubmittedTime - this.questionStartTime) / 1000;
-    }
 }
+window.PlayerAnswerManager = PlayerAnswerManager;
 
 class QuizGame {
     constructor(gamePin, isHost = false) {
@@ -135,9 +124,7 @@ class QuizGame {
     }
 
     async createGame(quiz) {
-        if (!this.isHost) {
-            return false;
-        }
+        if (!this.isHost) return false;
         
         try {
             const db = await this.waitForDatabase();
@@ -154,12 +141,11 @@ class QuizGame {
                 },
                 players: {},
                 createdAt: Date.now(),
-                hostId: this.generatePlayerId(),
+                hostId: window.generatePlayerId(),
                 hostUid: typeof auth !== 'undefined' && auth.currentUser ? auth.currentUser.uid : null
             };
 
-            const gameRef = db.ref(`games/${this.gamePin}`);
-            await gameRef.set(gameData);
+            await db.ref(`games/${this.gamePin}`).set(gameData);
             return true;
         } catch (error) {
             return false;
@@ -171,7 +157,7 @@ class QuizGame {
             const db = await this.waitForDatabase();
             if (!db) throw new Error('Database not available');
             
-            const safePlayerName = sanitizeHTML(playerName);
+            const safePlayerName = window.sanitizeHTML(playerName);
             const storageKey = 'quizmaster_playerId_' + this.gamePin;
             let playerId = sessionStorage.getItem(storageKey);
             let playerExists = false;
@@ -181,14 +167,13 @@ class QuizGame {
                 if (playerSnapshot.exists()) {
                     playerExists = true;
                 } else {
-                    playerId = this.generatePlayerId();
+                    playerId = window.generatePlayerId();
                 }
             } else {
-                playerId = this.generatePlayerId();
+                playerId = window.generatePlayerId();
             }
 
             sessionStorage.setItem(storageKey, playerId);
-
             const playerRef = db.ref(`games/${this.gamePin}/players/${playerId}`);
 
             if (!playerExists) {
@@ -217,17 +202,14 @@ class QuizGame {
     }
 
     async startGame() {
-        if (!this.isHost) {
-            return false;
-        }
+        if (!this.isHost) return false;
         
         try {
             const db = await this.waitForDatabase();
             if (!db) throw new Error('Database not available');
             
             const startTime = Date.now();
-            const gameStateRef = db.ref(`games/${this.gamePin}/gameState`);
-            await gameStateRef.update({
+            await db.ref(`games/${this.gamePin}/gameState`).update({
                 status: 'playing',
                 currentQuestion: 0,
                 questionStartTime: startTime
@@ -241,9 +223,7 @@ class QuizGame {
     }
 
     async nextQuestion() {
-        if (!this.isHost) {
-            return false;
-        }
+        if (!this.isHost) return false;
         
         try {
             const nextQuestionIndex = this.currentQuestion + 1;
@@ -278,16 +258,13 @@ class QuizGame {
     }
 
     async endGame() {
-        if (!this.isHost) {
-            return false;
-        }
+        if (!this.isHost) return false;
         
         try {
             const db = await this.waitForDatabase();
             if (!db) throw new Error('Database not available');
             
-            const gameStateRef = db.ref(`games/${this.gamePin}/gameState`);
-            await gameStateRef.update({
+            await db.ref(`games/${this.gamePin}/gameState`).update({
                 status: 'finished',
                 endedAt: Date.now()
             });
@@ -337,7 +314,6 @@ class QuizGame {
             
             const checkDatabase = () => {
                 attempts++;
-                
                 if (window.database && typeof window.database.ref === 'function') {
                     resolve(window.database);
                 } else if (attempts >= maxAttempts) {
@@ -351,18 +327,10 @@ class QuizGame {
         });
     }
 
-    generatePlayerId() {
-        return Date.now().toString() + '_' + Math.floor(Math.random() * 1000).toString();
-    }
-
     listenToGameState(callback) {
         this.waitForDatabase().then(db => {
-            if (!db) {
-                return;
-            }
-            
-            const gameStateRef = db.ref(`games/${this.gamePin}/gameState`);
-            gameStateRef.on('value', (snapshot) => {
+            if (!db) return;
+            db.ref(`games/${this.gamePin}/gameState`).on('value', (snapshot) => {
                 const gameState = snapshot.val();
                 if (gameState) {
                     if (gameState.questionStartTime) {
@@ -370,22 +338,15 @@ class QuizGame {
                     }
                     callback(gameState);
                 }
-            }, (error) => {
             });
         });
     }
 
     listenToPlayers(callback) {
         this.waitForDatabase().then(db => {
-            if (!db) {
-                return;
-            }
-            
-            const playersRef = db.ref(`games/${this.gamePin}/players`);
-            playersRef.on('value', (snapshot) => {
-                const players = snapshot.val() || {};
-                callback(players);
-            }, (error) => {
+            if (!db) return;
+            db.ref(`games/${this.gamePin}/players`).on('value', (snapshot) => {
+                callback(snapshot.val() || {});
             });
         });
     }
@@ -405,69 +366,29 @@ class QuizGame {
         }
     }
 }
+window.QuizGame = QuizGame; // Force instant global availability
 
-function generateGamePin() {
-    const pin = Math.floor(100000 + Math.random() * 900000).toString();
-    return pin;
-}
+window.generateGamePin = function() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
-function generatePlayerId() {
-    const id = Date.now().toString() + '_' + Math.floor(Math.random() * 1000).toString();
-    return id;
-}
+window.generatePlayerId = function() {
+    return Date.now().toString() + '_' + Math.floor(Math.random() * 1000).toString();
+};
 
-function calculateScore(isCorrect, responseTime, maxTime) {
+window.calculateScore = function(isCorrect, responseTime, maxTime) {
     if (!isCorrect) return 0;
-    
     const baseScore = 1000;
     const timeBonus = Math.floor((Math.max(0, maxTime - responseTime) / maxTime) * 500);
-    const totalScore = baseScore + timeBonus;
-    
-    return totalScore;
-}
+    return baseScore + timeBonus;
+};
 
-function showElement(elementId) {
+window.showElement = function(elementId) {
     const element = document.getElementById(elementId);
-    if (element) {
-        element.style.display = 'block';
-    }
-}
+    if (element) element.style.display = 'block';
+};
 
-function hideElement(elementId) {
+window.hideElement = function(elementId) {
     const element = document.getElementById(elementId);
-    if (element) {
-        element.style.display = 'none';
-    }
-}
-
-function waitForFirebase(callback, maxRetries = 30) {
-    let retries = 0;
-    
-    const checkFirebase = () => {
-        retries++;
-        
-        const databaseReady = window.database && typeof window.database.ref === 'function';
-        const authReady = window.auth && typeof window.auth.onAuthStateChanged === 'function';
-        
-        if (databaseReady || retries >= maxRetries) {
-            callback();
-        } else {
-            setTimeout(checkFirebase, 200);
-        }
-    };
-    checkFirebase();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    waitForFirebase(() => {
-        window.ScoringSystem = ScoringSystem;
-        window.PlayerAnswerManager = PlayerAnswerManager;
-        window.QuizGame = QuizGame;
-        window.generateGamePin = generateGamePin;
-        window.generatePlayerId = generatePlayerId;
-        window.calculateScore = calculateScore;
-        window.showElement = showElement;
-        window.hideElement = hideElement;
-        window.sanitizeHTML = sanitizeHTML;
-    });
-});
+    if (element) element.style.display = 'none';
+};
